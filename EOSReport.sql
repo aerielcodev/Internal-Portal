@@ -5,6 +5,7 @@ SELECT
         ud.CodevId AS 'Employee Number', 
         ud.FirstName AS 'First Name', 
         ud.LastName AS 'Last Name' , 
+        eosR.EOSReport,
         eosR.[CreatedBy], 
         eosR.[Created], 
         eosR.[LastModifiedBy], 
