@@ -1,6 +1,6 @@
-SELECT DISTINCT
+SELECT
     j.Id AS Id,
-    j.JobTitle AS 'Job Title',
+    c.CompanyName AS Company,
     joPosn.Name AS 'Position',
     joType.Name AS 'Type',
     joTeam.Name AS 'Team',
@@ -12,14 +12,12 @@ SELECT DISTINCT
     r.recruiter AS Recruiter,
     ofc.location AS 'Office Location',
     CASE
-    WHEN j.DifficultyId = 1 THEN 'Easy'
-    WHEN j.DifficultyId = 2 THEN 'Medium'
-    WHEN j.DifficultyId = 3 THEN 'Hard'
+        WHEN j.DifficultyId = 1 THEN 'Easy'
+        WHEN j.DifficultyId = 2 THEN 'Medium'
+        WHEN j.DifficultyId = 3 THEN 'Hard'
     END AS Difficulty,
     j.IsCustomerCreated AS IsCustomerCreated,
     j.Created AS Created,
-    ud.FirstName + ' ' + ud.LastName AS 'Created By',
-    md.FirstName + ' ' + md.LastName AS 'Modified By',
     jp.VerifiedStatusChangeDate AS VerifiedStatusChangeDate
 FROM JobOpenings j
 LEFT JOIN JobOpeningPositions jp ON j.Id = jp.JobOpeningId
@@ -35,8 +33,6 @@ FROM JobOpeningLocations
 INNER JOIN Offices ON Offices.Id = JobOpeningLocations.OfficeId
 GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
-LEFT JOIN UserDetails ud ON ud.UserId = j.CreatedBy /*Created by User*/
-LEFT JOIN UserDetails md ON md.UserId = j.CreatedBy /*Modified by User*/
 LEFT JOIN Teams t ON t.Id = j.TeamId
 LEFT JOIN (
     SELECT
