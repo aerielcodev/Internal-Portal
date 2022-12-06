@@ -1,6 +1,6 @@
 SELECT
     j.Id AS Id,
-    c.CompanyName AS Company,
+    c.CompanyName AS Customer,
     joPosn.Name AS 'Position',
     joType.Name AS 'Type',
     joTeam.Name AS 'Team',
