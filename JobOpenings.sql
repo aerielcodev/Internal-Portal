@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     j.Id AS Id,
     j.JobTitle AS 'Job Title',
     joPosn.Name AS 'Position',
@@ -9,7 +9,8 @@ SELECT
     j.Budget AS Budget,
     jp.JobOpeningNumber AS 'Job Opening Number',
     t.Name AS 'Team Name',
-    r.FirstName + ' ' + r.LastName AS Recruiter,
+    r.recruiter AS Recruiter,
+    ofc.location AS 'Office Location',
     CASE
     WHEN j.DifficultyId = 1 THEN 'Easy'
     WHEN j.DifficultyId = 2 THEN 'Medium'
@@ -26,6 +27,13 @@ LEFT JOIN JobOpeningStatuses js ON js.Id = jp.JobOpeningStatusId
 LEFT JOIN JobPositions joPosn ON joPosn.Id = j.JobPositionId
 LEFT JOIN JobTypes joType ON joType.Id = joPosn.JobTypeId
 LEFT JOIN JobTeams joTeam ON joTeam.Id = joType.JobTeamId
+LEFT JOIN (
+    SELECT
+    JobOpeningLocations.JobOpeningId AS JobOpeningId,
+    string_agg(Offices.Location,',') AS location
+FROM JobOpeningLocations
+INNER JOIN Offices ON Offices.Id = JobOpeningLocations.OfficeId
+GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
 LEFT JOIN UserDetails ud ON ud.UserId = j.CreatedBy /*Created by User*/
 LEFT JOIN UserDetails md ON md.UserId = j.CreatedBy /*Modified by User*/
@@ -33,7 +41,8 @@ LEFT JOIN Teams t ON t.Id = j.TeamId
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        UserDetails.*
+        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') recruiter
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
-) AS r ON  r.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
+GROUP BY Employees.Id) AS r ON  r.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
+
