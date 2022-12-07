@@ -8,7 +8,8 @@ SELECT
     i.InterviewFeedback AS 'Interview Feedback',
     i.Created AS Created,
     ud.FirstName + ' ' + ud.LastName AS 'Created By',
-    jobC.JobOpeningId AS JobOpeningId
+    jobC.JobOpeningId AS JobOpeningId,
+    IIF(jobC.InterviewRequestedBy IS NOT NULL, 'Y','N') AS 'Interview Requested'
 FROM JobOpeningCandidateScheduleInterviews i 
 INNER JOIN JobOpeningCandidates jobC ON jobC.Id = i.JobOpeningCandidateId
 LEFT JOIN CandidateProfileInformations c ON c.Id = jobC.CandidateId 
