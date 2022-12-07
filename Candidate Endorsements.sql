@@ -22,5 +22,5 @@ FROM JobOpeningCandidates jc
 LEFT JOIN CandidateProfileInformations c ON c.Id = jc.CandidateId 
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) e ON e.Id = jc.EmployeeId
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
-LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) en ON en.UserId = jc.CreatedBy
+LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) en ON en.UserId = jc.CreatedBy /*user who endorsed the candidate*/
 
