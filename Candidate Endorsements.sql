@@ -1,5 +1,6 @@
 /*List of all endrosed candidates for job openings. Job Opening Information is not available on this table. */
 SELECT
+    jc.Id Id,
     e.CodevId,
     CASE
         WHEN jc.CandidateId IS NOT NULL THEN c.FirstName + ' ' + c.LastName
