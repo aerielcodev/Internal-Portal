@@ -1,3 +1,4 @@
+/*List of all endrosed candidates for job openings. Job Opening Information is not available on this table. */
 SELECT
     e.CodevId,
     CASE
