@@ -1,5 +1,6 @@
 SELECT
     j.Id AS Id,
+    j.JobTitle AS 'Job Title',
     c.CompanyName AS Customer,
     joPosn.Name AS 'Position',
     joType.Name AS 'Type',
