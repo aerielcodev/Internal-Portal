@@ -19,6 +19,7 @@ SELECT
     END AS Difficulty,
     j.IsCustomerCreated AS IsCustomerCreated,
     j.Created AS Created,
+    j.CreatedBy AS CreatedByUserId,
     jp.VerifiedStatusChangeDate AS VerifiedStatusChangeDate
 FROM JobOpenings j
 LEFT JOIN JobOpeningPositions jp ON j.Id = jp.JobOpeningId
