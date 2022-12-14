@@ -5,6 +5,10 @@ SELECT
     joPosn.Name AS 'Position',
     joType.Name AS 'Type',
     joTeam.Name AS 'Team',
+    CASE
+        WHEN c.TypeId = 1 THEN 'Customer'
+        WHEN c.TypeId = 2 THEN 'Prospect'
+    END AS 'Customer Type',
     js.Name AS 'Job Opening Status',
     j.IdealStartDate AS 'Ideal Start Date',
     j.Budget AS Budget,
