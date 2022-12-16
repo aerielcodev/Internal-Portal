@@ -1,8 +1,10 @@
 SELECT DISTINCT
     r.Id,
     r.TicketNumber,
+    cx.Id AS CustomerId,
     cx.CompanyName,
     rt.Name AS Type,
+    r.Message AS Message,
     CASE
        WHEN r.UrgencyTypeId = 1 THEN 'Low'
        WHEN r.UrgencyTypeId = 2 THEN 'Medium'
@@ -26,8 +28,10 @@ UNION ALL
 SELECT
     c.Id,
     c.TicketNumber,
+    cx.Id ,
     cx.CompanyName,
     ct.Name,
+    cct.Message,
     CASE
        WHEN c.UrgencyId = 1 THEN 'Low'
        WHEN c.UrgencyId = 2 THEN 'Medium'
