@@ -31,7 +31,7 @@ SELECT
     cx.Id ,
     cx.CompanyName,
     ct.Name,
-    cct.Message,
+    cxt.Message,
     CASE
        WHEN c.UrgencyId = 1 THEN 'Low'
        WHEN c.UrgencyId = 2 THEN 'Medium'
@@ -45,6 +45,7 @@ SELECT
     cct.Created,
    'Concern'
 FROM CustomerConcerns c
+LEFT JOIN CustomerConcernThreads cxt ON cxt.CustomerConcernId = c.Id AND cxt.CustomerConcernThreadType = 1 /*customer information*/
 LEFT JOIN CustomerConcernThreads cct ON cct.CustomerConcernId = c.Id AND cct.CustomerConcernThreadType = 2
 LEFT JOIN Customers cx ON cx.Id = c.CustomerId
 LEFT JOIN ConcernTypes ct ON ct.Id = c.ConcernTypeId
