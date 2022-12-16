@@ -1,0 +1,11 @@
+SELECT 
+    cc.Id,
+    cc.CustomerId,
+    emp.FirstName + ' ' + emp.LastName AS Name,
+    ct.Name
+FROM dbo.CustomerCodevContacts cc
+LEFT JOIN (
+    SELECT emp.*,e.Id 
+    FROM Employees e 
+    INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = cc.EmployeeId
+LEFT JOIN dbo.CustomerCodevContactTypes ct ON ct.Id = cc.CustomerCodevContactTypeId
