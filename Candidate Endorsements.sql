@@ -17,7 +17,8 @@ SELECT
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.JobOpeningId AS JobOpeningId,
-    jc.InterviewRequestedBy AS 'Interview Requested By'
+    jc.InterviewRequestedBy AS 'Interview Requested By',
+    jc.InitialInterviewRequestDate 
 FROM JobOpeningCandidates jc
 LEFT JOIN CandidateProfileInformations c ON c.Id = jc.CandidateId 
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) e ON e.Id = jc.EmployeeId
