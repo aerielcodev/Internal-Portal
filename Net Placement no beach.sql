@@ -10,7 +10,6 @@ SELECT
     'Placement' AS 'Group',
     cr.FirstName + ' ' + cr.LastName AS 'Created By',
     m.FirstName + ' ' + m.LastName AS 'Modified By'
-
 FROM Customers c 
 LEFT JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
