@@ -2,7 +2,7 @@ SELECT
     cc.Id,
     cc.CustomerId,
     emp.FirstName + ' ' + emp.LastName AS Name,
-    ct.Name
+    ct.Name AS Assignment
 FROM dbo.CustomerCodevContacts cc
 LEFT JOIN (
     SELECT emp.*,e.Id 
