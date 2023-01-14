@@ -48,4 +48,4 @@ LEFT JOIN (
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS r ON  r.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
-
+WHERE j.CustomerId != 281 /**281 is the dummy customer*/
