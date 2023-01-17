@@ -2,6 +2,7 @@ SELECT
     ce.id,
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
+    ce.JobTitle AS 'Job Title',
     c.CompanyName,
     CONVERT(date,ce.DateStart) AS Placement,
     CONVERT(date,ce.DateEnd) AS 'Placement End'
