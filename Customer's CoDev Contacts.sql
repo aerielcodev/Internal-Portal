@@ -9,3 +9,4 @@ LEFT JOIN (
     FROM Employees e 
     INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = cc.EmployeeId
 LEFT JOIN dbo.CustomerCodevContactTypes ct ON ct.Id = cc.CustomerCodevContactTypeId
+WHERE cc.CustomerId != 281 /*281 is the dummy customer's id*/

@@ -10,4 +10,4 @@ SELECT DISTINCT
   FROM CustomerUsers u
   LEFT JOIN Customers c ON c.Id = u.CustomerId
   LEFT JOIN CustomerUserRoles cr ON cr.Id = u.CustomerUserRoleId
-  WHERE (u.FirstName + ' ' + u.LastName IS NOT NULL) AND (u.FirstName + ' ' + u.LastName != ' ')
+  WHERE (u.FirstName + ' ' + u.LastName IS NOT NULL) AND (u.FirstName + ' ' + u.LastName != ' ') AND u.CustomerId != 281
