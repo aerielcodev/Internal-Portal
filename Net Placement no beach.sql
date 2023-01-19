@@ -4,8 +4,8 @@ SELECT
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
     c.CompanyName,
-    ce.DateStart AS Placement,
-    ce.DateEnd AS 'Placement End',
+    ce.DateStart AS Start,
+    ce.DateEnd AS End,
     'Placement' AS 'Group',
     cr.FirstName + ' ' + cr.LastName AS 'Created By',
     m.FirstName + ' ' + m.LastName AS 'Modified By'
