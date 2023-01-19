@@ -1,12 +1,11 @@
 SELECT
-
-    CONVERT(date,ce.DateStart) AS 'Placement/Offboard',
+    ce.DateStart AS 'Placement/Offboard',
     ce.id,
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
     c.CompanyName,
-    CONVERT(date,ce.DateStart) AS Placement,
-    CONVERT(date,ce.DateEnd) AS 'Placement End',
+    ce.DateStart AS Placement,
+    ce.DateEnd AS 'Placement End',
     'Placement' AS 'Group',
     cr.FirstName + ' ' + cr.LastName AS 'Created By',
     m.FirstName + ' ' + m.LastName AS 'Modified By'
@@ -18,13 +17,13 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' )
 UNION ALL
 SELECT
-    CONVERT(date,ce.DateEnd),
+    ce.DateEnd,
     ce.id,
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)),
     c.CompanyName,
-    CONVERT(date,ce.DateStart) ,
-    CONVERT(date,ce.DateEnd) ,
+   ce.DateStart ,
+   ce.DateEnd ,
     'Offboard' AS 'Group',
     cr.FirstName + ' ' + cr.LastName,
     m.FirstName + ' ' + m.LastName
