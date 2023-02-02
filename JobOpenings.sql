@@ -1,6 +1,7 @@
 SELECT
     j.Id AS Id,
     c.id AS CustomerId,
+    jt.Name AS 'Job Type',
     j.JobTitle AS 'Job Title',
     c.CompanyName AS Customer,
     joPosn.Name AS 'Position',
@@ -32,6 +33,7 @@ LEFT JOIN JobOpeningStatuses js ON js.Id = jp.JobOpeningStatusId
 LEFT JOIN JobPositions joPosn ON joPosn.Id = j.JobPositionId
 LEFT JOIN JobTypes joType ON joType.Id = joPosn.JobTypeId
 LEFT JOIN JobTeams joTeam ON joTeam.Id = joType.JobTeamId
+LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
 LEFT JOIN (
     SELECT
     JobOpeningLocations.JobOpeningId AS JobOpeningId,
