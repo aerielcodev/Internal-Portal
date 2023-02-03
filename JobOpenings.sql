@@ -4,7 +4,7 @@ SELECT
     jt.Name AS 'Job Type',
     j.JobTitle AS 'Job Title',
     c.CompanyName AS Customer,
-    joPosn.Name AS 'Position',
+    jp.Name AS 'Position',
     joType.Name AS 'Type',
     joTeam.Name AS 'Team',
     CASE
@@ -13,8 +13,10 @@ SELECT
     END AS 'Customer Type',
     js.Name AS 'Job Opening Status',
     j.IdealStartDate AS 'Ideal Start Date',
+    ce.DateStart AS 'Official Start Date',
+    emp.teamMember,
     j.Budget AS Budget,
-    jp.JobOpeningNumber AS 'Job Opening Number',
+    jon.Number AS 'Job Opening Number',
     t.Name AS 'Team Name',
     r.recruiter AS Recruiter,
     ofc.location AS 'Office Location',
@@ -26,12 +28,13 @@ SELECT
     j.IsCustomerCreated AS IsCustomerCreated,
     j.Created AS Created,
     j.CreatedBy AS CreatedByUserId,
-    jp.VerifiedStatusChangeDate AS VerifiedStatusChangeDate
-FROM JobOpenings j
-LEFT JOIN JobOpeningPositions jp ON j.Id = jp.JobOpeningId
-LEFT JOIN JobOpeningStatuses js ON js.Id = jp.JobOpeningStatusId
-LEFT JOIN JobPositions joPosn ON joPosn.Id = j.JobPositionId
-LEFT JOIN JobTypes joType ON joType.Id = joPosn.JobTypeId
+    jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate
+FROM JobOpeningNumbers jon
+LEFT JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
+LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
+LEFT JOIN JobOpeningStatuses js ON js.Id = jop.JobOpeningStatusId
+LEFT JOIN JobPositions jp ON jp.Id = j.JobPositionId
+LEFT JOIN JobTypes joType ON joType.Id = jp.JobTypeId
 LEFT JOIN JobTeams joTeam ON joTeam.Id = joType.JobTeamId
 LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
 LEFT JOIN (
@@ -43,6 +46,14 @@ INNER JOIN Offices ON Offices.Id = JobOpeningLocations.OfficeId
 GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
 LEFT JOIN Teams t ON t.Id = j.TeamId
+LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id
+LEFT JOIN (
+    SELECT
+        Employees.Id AS eId,
+        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') teamMember
+    FROM Employees
+    INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
+GROUP BY Employees.Id) AS emp ON  emp.eId = ce.EmployeeId
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
@@ -50,4 +61,4 @@ LEFT JOIN (
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS r ON  r.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
-WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' )/**281 is the dummy customer*/
+WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' )/**281 is the dummy customer*/ 
