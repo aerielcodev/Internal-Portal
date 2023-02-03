@@ -1,5 +1,6 @@
 SELECT
     ce.id,
+    c.Id AS CustomerId,
     jon.Number AS 'Job Opening Number',
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
@@ -7,6 +8,7 @@ SELECT
     c.CompanyName,
     ce.DateStart,
     ce.DateEnd,
+    jt.Name AS 'Job Opening Type',
     rates.NewRate AS 'Latest Rate',
     oc.Name AS 'Offboarding Category',
     r.subCat AS 'Offboarding SubCategory',
@@ -14,6 +16,7 @@ SELECT
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
+LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
 INNER JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id
 INNER JOIN Customers c ON ce.CustomerId = c.Id
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
