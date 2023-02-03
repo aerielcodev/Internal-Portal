@@ -13,7 +13,8 @@ SELECT
     END AS 'Customer Type',
     js.Name AS 'Job Opening Status',
     j.IdealStartDate AS 'Ideal Start Date',
-    ce.DateStart AS 'Official Start Date',
+    ce.DateStart,
+    ri.NewRate AS Rate,
     emp.teamMember,
     j.Budget AS Budget,
     jon.Number AS 'Job Opening Number',
@@ -54,6 +55,7 @@ LEFT JOIN (
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS emp ON  emp.eId = ce.EmployeeId
+LEFT JOIN RateIncreases ri ON ri.EmployeeId = ce.EmployeeId AND ri.EffectiveDate = ce.DateStart
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
