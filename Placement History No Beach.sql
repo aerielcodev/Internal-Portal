@@ -9,7 +9,8 @@ SELECT
     ce.DateStart,
     ce.DateEnd,
     jt.Name AS 'Job Opening Type',
-    rates.NewRate AS 'Latest Rate',
+    fRate.NewRate AS 'First Rate',
+    lRate.NewRate AS 'Latest Rate',
     oc.Name AS 'Offboarding Category',
     r.subCat AS 'Offboarding SubCategory',
     o.Note AS 'Offboarding Note'
@@ -30,6 +31,9 @@ FROM EmployeeOffboardingSubCategories s
 INNER JOIN OffboardingSubCategories s2 ON s.OffboardingSubCategoryId = s2.Id GROUP BY s.EmployeeOffboardingId,s2.OffboardingCategoryId)  AS r ON r.EmployeeOffboardingId = o.Id
 LEFT JOIN OffboardingCategories oc ON oc.Id = r.OffboardingCategoryId
 OUTER APPLY (
-    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND EffectiveDate <= ISNULL(ce.DateEnd, SYSDATETIMEOFFSET()) ORDER BY EffectiveDate DESC
-    ) AS rates
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate ASC
+    ) AS fRate
+OUTER APPLY (
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate DESC
+    ) AS lRate
 WHERE c.Id != 1 AND c.Id != 281 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%')
