@@ -15,7 +15,7 @@ SELECT
     r.subCat AS 'Offboarding SubCategory',
     o.Note AS 'Offboarding Note',
     lRate.Id AS lRateId
-FROM JobOpeningNumbers jon 
+FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
 LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
