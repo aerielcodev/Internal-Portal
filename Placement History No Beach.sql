@@ -13,7 +13,8 @@ SELECT
     lRate.NewRate AS 'Latest Rate',
     oc.Name AS 'Offboarding Category',
     r.subCat AS 'Offboarding SubCategory',
-    o.Note AS 'Offboarding Note'
+    o.Note AS 'Offboarding Note',
+    lRate.Id AS lRateId
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
