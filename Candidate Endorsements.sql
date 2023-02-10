@@ -24,6 +24,7 @@ SELECT
     jc.DateJobOfferAccepted,
     jc.DateOfOnboarding,
     jc.JobOpeningId AS JobOpeningId,
+    jc.LastModified,
     jc.InterviewRequestedBy AS 'Interview Requested By'
 FROM JobOpeningCandidates jc
 LEFT JOIN CandidateProfileInformations c ON c.Id = jc.CandidateId 
