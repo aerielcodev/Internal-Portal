@@ -1,10 +1,12 @@
 SELECT
     c.Id AS Id,
+    jc.Id AS JobOpeningCandidatesId,
+    e.CodevId,
     CASE
         WHEN jc.CandidateId IS NOT NULL THEN c.FirstName + ' ' + c.LastName
         ELSE e.FirstName + ' ' + e.LastName
     END AS Name,
-    i.ScheduleDate AS 'Schedule Date',
+    i.ScheduleDate AS ScheduleDate,
     i.InterviewFeedback AS 'Interview Feedback',
     i.Created AS Created,
     ud.FirstName + ' ' + ud.LastName AS 'Created By',
