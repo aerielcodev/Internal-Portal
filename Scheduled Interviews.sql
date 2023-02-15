@@ -1,5 +1,5 @@
 SELECT
-    c.Id AS Id,
+    i.Id AS Id,
     jc.Id AS JobOpeningCandidatesId,
     e.CodevId,
     CASE
