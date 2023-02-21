@@ -9,5 +9,5 @@ SELECT
 FROM dbo.EmployeeSupervisors es
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = es.EmployeeId
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) sup ON sup.Id = es.SupervisorId
-INNER JOIN dbo.CustomerEmployees ce ON ce.Id = es.CustomerEmployeeId
+LEFT JOIN dbo.CustomerEmployees ce ON ce.Id = es.CustomerEmployeeId
 ORDER BY es.EffectiveDate DESC
