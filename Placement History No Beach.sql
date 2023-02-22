@@ -1,6 +1,7 @@
 SELECT
     ce.id,
     c.Id AS CustomerId,
+    ce.EmployeeId,
     jon.Number AS 'Job Opening Number',
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
