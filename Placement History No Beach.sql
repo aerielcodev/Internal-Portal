@@ -9,6 +9,8 @@ SELECT
     c.CompanyName,
     ce.DateStart,
     ce.DateEnd,
+    ce.PartTimeDate,
+    ce.FullTimeDate,
     jt.Name AS 'Job Opening Type',
     fRate.NewRate AS 'First Rate',
     lRate.NewRate AS 'Latest Rate',
