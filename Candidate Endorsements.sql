@@ -22,7 +22,8 @@ SELECT
     jc.InitialInterviewRequestDate,
     jc.JobOfferExtended,
     jc.DateJobOfferAccepted,
-    jc.DateOfOnboarding,
+    jc.FullTimeStartDate,
+    jc.PartTimeStartDate,
     jc.JobOpeningId AS JobOpeningId,
     jc.LastModified,
     jc.InterviewRequestedBy AS 'Interview Requested By'
