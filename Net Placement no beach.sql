@@ -1,4 +1,5 @@
 SELECT
+    ce.CustomerId,
     ce.DateStart AS 'Placement/Offboard',
     ce.id,
     emp.CoDevId,
@@ -29,6 +30,7 @@ OUTER APPLY (
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' ) AND c.Id != 281
 UNION ALL
 SELECT
+ce.CustomerId,
     ce.DateEnd,
     ce.id,
     emp.CoDevId,
