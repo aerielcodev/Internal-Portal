@@ -24,7 +24,7 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cr ON cr.UserId = ce.CreatedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) m ON m.UserId = ce.LastModifiedBy
 OUTER APPLY (
-    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate ASC
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND CustomerEmployeeId = ce.Id ORDER BY EffectiveDate ASC
     ) AS fRate
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' ) AND c.Id != 281
 UNION ALL
@@ -54,6 +54,6 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cr ON cr.UserId = ce.CreatedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) m ON m.UserId = ce.LastModifiedBy
 OUTER APPLY (
-    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate DESC
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND EffectiveDate <= ce.DateEnd ORDER BY EffectiveDate DESC
     ) AS lRate
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%')  AND ce.DateEnd IS NOT NULL AND c.Id != 281
