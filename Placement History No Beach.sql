@@ -1,6 +1,7 @@
 SELECT
     ce.id,
     c.Id AS CustomerId,
+    jop.Id AS JobOpeningPositionId,
     ce.EmployeeId,
     jon.Number AS 'Job Opening Number',
     emp.CoDevId,
