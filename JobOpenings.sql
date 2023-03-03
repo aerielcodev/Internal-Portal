@@ -2,6 +2,7 @@ SELECT
     j.Id AS Id,
     c.id AS CustomerId,
     jop.Id AS JobOpeningPositionId,
+    jop.JobOpeningStatusId,
     jt.Name AS 'Job Type',
     j.JobTitle AS 'Job Title',
     c.CompanyName AS Customer,
