@@ -7,7 +7,7 @@ CASE
     WHEN cp.GenderId = 2 THEN 'Female'         
     ELSE 'Not Specified'     
 END AS Gender,     
-    cp.QualifiedDate AS 'Qualified Date',     
+    isnull(cp.QualifiedDate,cp.Created) AS 'Qualified Date',     
     r.recruiter AS Recruiter,     
     cp.Created,     
     cp.CountryId  
