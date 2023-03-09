@@ -1,4 +1,5 @@
 SELECT 
+    emp.Id AS EmployeeId,
     emp.CoDevId,
     upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
     pivotTbl.[1] AS 'Primary Skills',
