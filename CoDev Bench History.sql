@@ -1,4 +1,5 @@
 SELECT
+    ce.EmployeeId,
     ce.id,
     emp.CoDevId,
     upper(emp.FirstName + ' ' + emp.LastName) AS 'Team Member',
