@@ -4,10 +4,10 @@ SELECT
     emp.Id AS EmployeeId,
     emp.FirstName + ' ' + emp.LastName AS Name,
     CASE
-    WHEN cc.DateStart = '0001-01-01 00:00:00.0000000 +00:00' THEN '2023-01-01 00:00:00.0000000 +00:00'
-    ELSE cc.DateStart
+    WHEN cc.DateStart = '0001-01-01 00:00:00.0000000 +00:00' THEN '2023-01-01'
+    ELSE cast(cc.DateStart AS Date)
     END AS DateStart,
-    cc.DateEnd,
+    cast(cc.DateEnd AS Date) AS DateEnd,
     ct.Name AS Assignment
 FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
 LEFT JOIN (
