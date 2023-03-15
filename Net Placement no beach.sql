@@ -9,8 +9,7 @@ SELECT
     c.CompanyName,
     ce.DateStart AS 'Start',
     ce.PartTimeDate,
-    ce.FullTimeDate,
-    fRate.NewRate AS 'Rate',
+    isnull(ft.EffectiveDate,ce.DateStart) AS FullTimeDate,    fRate.NewRate AS 'Rate',
     ce.DateEnd AS 'End',
     'Placement' AS 'Group',
     cr.FirstName + ' ' + cr.LastName AS 'Created By',
@@ -27,6 +26,7 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate ASC
     ) AS fRate
+LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' ) AND c.Id != 281
 UNION ALL
 SELECT
@@ -40,7 +40,7 @@ ce.CustomerId,
     c.CompanyName,
    ce.DateStart ,
     ce.PartTimeDate,
-    ce.FullTimeDate,
+    isnull(ft.EffectiveDate,ce.DateStart),
    lRate.NewRate,
    ce.DateEnd ,
     'Offboard' AS 'Group',
@@ -58,4 +58,6 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND CustomerId = ce.CustomerId ORDER BY EffectiveDate DESC
     ) AS lRate
+    LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
+
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%')  AND ce.DateEnd IS NOT NULL AND c.Id != 281
