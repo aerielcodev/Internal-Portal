@@ -19,3 +19,4 @@ LEFT JOIN (
     UserDetails.FirstName + ' ' + UserDetails.LastName AS recruiter     
     FROM Employees     
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId) AS r ON r.eId = cp.RecruiterId
+    WHERE cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%'  

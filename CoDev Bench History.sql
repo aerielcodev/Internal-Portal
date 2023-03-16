@@ -15,4 +15,5 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) m ON m.UserId = ce.LastModifiedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cb ON cb.UserId = ce.CreatedBy
 WHERE c.Id = 1 AND ce.IsDeleted = 0
+AND (emp.FirstName NOT LIKE '%demo%'  AND  emp.FirstName NOT LIKE '%demo%')
 ORDER BY [Team Member] ASC

@@ -33,14 +33,15 @@ SELECT
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
-INNER JOIN JobOpeningCandidates jc ON jc.JobOpeningId  = j.Id
-LEFT JOIN CandidateProfileInformations c ON c.Id = jc.CandidateId 
-LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) e ON e.Id = jc.EmployeeId
+INNER JOIN JobOpeningCandidates jc ON jc.JobOpeningId  = j.Id 
+LEFT JOIN CandidateProfileInformations c ON c.Id = jc.CandidateId AND (c.FirstName NOT LIKE '%demo%'  OR  c.LastName NOT LIKE '%demo%' )
+LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) e ON e.Id = jc.EmployeeId AND (e.FirstName NOT LIKE '%demo%'  OR  e.LastName NOT LIKE '%demo%' )
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
 LEFT JOIN NotAFitCategoryTypes naft ON naft.Id = jc.NotAFitCategoryTypeId
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) en ON en.UserId = jc.CreatedBy /*user who endorsed the candidate*/
 LEFT JOIN CustomerUsers d ON d.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
- WHERE j.CustomerId != 281 AND (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' ) AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
+ WHERE j.CustomerId != 281 AND (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' ) 
+  AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
 
