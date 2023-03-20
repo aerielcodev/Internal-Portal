@@ -1,5 +1,17 @@
 SELECT
-    *
+    JobOpeningPositionId,
+    jobOpeningId,
+    jobOpeningNumber,
+    [Developing],
+    coalesce([Verified],VerifiedStatusChangeDate) AS Verified,
+    [Candidates Presented],
+    [Interviewing],
+    [Candidate Selected],
+    [Service Order Signed],
+    [Waiting for Onboarding],
+    [Filled],
+    [Cancelled],
+    [Closed]
 FROM 
 (
     SELECT
@@ -7,7 +19,8 @@ FROM
         jd.JobOpeningPositionId,
         jo.Id AS jobOpeningId,
         jon.Number AS jobOpeningNumber,
-        js.Name AS JoName
+        js.Name AS JoName,
+        jop.VerifiedStatusChangeDate
     FROM JobOpeningNumbers jon
     INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
     INNER JOIN JobOpeningPositionStatusChangeDates jd ON jop.Id = jd.JobOpeningPositionId
