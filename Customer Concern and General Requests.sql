@@ -3,6 +3,7 @@ SELECT DISTINCT
     r.TicketNumber,
     cx.Id AS CustomerId,
     cx.CompanyName,
+    tm.teamMember,
     rt.Name AS Type,
     r.Message AS Message,
     CASE
@@ -29,12 +30,21 @@ LEFT JOIN UserDetails ud ON ud.UserId = grt.CreatedBy
 LEFT JOIN UserDetails cb ON cb.UserId = r.CreatedBy
 LEFT JOIN UserDetails mb ON mb.UserId = r.LastModifiedBy
 LEFT JOIN CustomerUsers cu ON cu.UserId = r.CreatedBy
+LEFT JOIN (
+    SELECT
+        GeneralRequestMembers.Id AS genReqId,
+        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') teamMember
+    FROM GeneralRequestMembers
+    INNER JOIN Employees ON Employees.Id = GeneralRequestMembers.EmployeeId
+    INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
+GROUP BY GeneralRequestMembers.Id) AS tm ON  tm.genReqId = r.Id
 UNION ALL
-SELECT
+SELECT DISTINCT
     c.Id,
     c.TicketNumber,
     cx.Id ,
     cx.CompanyName,
+    tm.teamMember,
     ct.Name,
     cxt.Message,
     CASE
@@ -61,3 +71,11 @@ LEFT JOIN UserDetails ud ON ud.UserId = cct.CreatedBy
 LEFT JOIN UserDetails cb ON cb.UserId = c.CreatedBy
 LEFT JOIN UserDetails mb ON mb.UserId = c.LastModifiedBy
 LEFT JOIN CustomerUsers cu ON cu.UserId = c.CreatedBy
+LEFT JOIN (
+    SELECT
+        CustomerConcernEmployees.CustomerConcernId AS concernId,
+        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') teamMember
+    FROM CustomerConcernEmployees
+    INNER JOIN Employees ON CustomerConcernEmployees.EmployeeId = Employees.Id
+    INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
+GROUP BY CustomerConcernEmployees.CustomerConcernId) AS tm ON  tm.concernId = c.Id
