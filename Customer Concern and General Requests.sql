@@ -32,12 +32,12 @@ LEFT JOIN UserDetails mb ON mb.UserId = r.LastModifiedBy
 LEFT JOIN CustomerUsers cu ON cu.UserId = r.CreatedBy
 LEFT JOIN (
     SELECT
-        GeneralRequestMembers.Id AS genReqId,
+        GeneralRequestMembers.GeneralRequestId AS genReqId,
         string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') teamMember
     FROM GeneralRequestMembers
     INNER JOIN Employees ON Employees.Id = GeneralRequestMembers.EmployeeId
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
-GROUP BY GeneralRequestMembers.Id) AS tm ON  tm.genReqId = r.Id
+GROUP BY GeneralRequestMembers.GeneralRequestId) AS tm ON  tm.genReqId = r.Id
 UNION ALL
 SELECT DISTINCT
     c.Id,
