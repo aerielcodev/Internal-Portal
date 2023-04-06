@@ -5,7 +5,7 @@ SELECT
     ce.EmployeeId,
     jon.Number AS 'Job Opening Number',
     emp.CoDevId,
-    upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS 'Team Member',
+    emp.teamMember AS 'Team Member',
     ce.JobTitle AS 'Job Title',
     c.CompanyName,
     ce.DateStart,
@@ -18,14 +18,27 @@ SELECT
     oc.Name AS 'Offboarding Category',
     r.subCat AS 'Offboarding SubCategory',
     o.Note AS 'Offboarding Note',
+    emp.Location AS 'Assigned Office',
+    emp.Name AS Country,
     lRate.Id AS lRateId
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
-LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
 INNER JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id
 INNER JOIN Customers c ON ce.CustomerId = c.Id
-LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
+LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
+LEFT JOIN (
+    SELECT 
+        emp.CodevId,
+        upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS teamMember,
+        e.Id, 
+        ofc.Location,
+        co.Name
+    FROM Employees e 
+    INNER JOIN UserDetails emp ON emp.UserId = e.UserId
+    LEFT JOIN EmployeeHRReferences ehr ON ehr.Id = e.EmployeeHrReferenceId
+    LEFT JOIN Offices AS ofc ON ofc.Id = ehr.OfficeId
+    LEFT JOIN Countries AS co ON co.Id = ofc.CountryId) emp ON emp.Id = ce.EmployeeId
 LEFT JOIN EmployeeOffboardings o ON o.CustomerEmployeeId = ce.Id
 LEFT JOIN (
     SELECT 
@@ -42,4 +55,9 @@ OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate DESC
     ) AS lRate
 LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
-WHERE c.Id != 1 AND c.Id != 281 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%') AND ce.IsDeleted = 0
+WHERE
+    c.Id NOT IN (1, 281)
+    AND ce.IsDeleted = 0
+    AND c.CompanyName NOT LIKE 'codev%'
+    AND c.CompanyName NOT LIKE '%breakthrough%'
+    AND ce.Id IS NOT NULL
