@@ -10,7 +10,9 @@ END AS Gender,
     isnull(cp.QualifiedDate,cp.Created) AS 'Qualified Date',     
     r.recruiter AS Recruiter,     
     cp.Created,     
-    cp.CountryId  
+    o.offices AS 'Preferred Office',
+    c.Name AS Country,  
+    c.Code AS CountryCode
 FROM CandidateProfileInformations cp 
 LEFT JOIN CandidateStatuses s ON s.Id = cp.CandidateStatusId 
 LEFT JOIN (     
@@ -19,4 +21,12 @@ LEFT JOIN (
     UserDetails.FirstName + ' ' + UserDetails.LastName AS recruiter     
     FROM Employees     
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId) AS r ON r.eId = cp.RecruiterId
+LEFT JOIN (
+    SELECT
+        CandidatePreferredOfficeLocations.CandidateProfileInformationId AS cpId,
+        string_agg(Offices.Location,',') AS offices
+    FROM CandidatePreferredOfficeLocations
+    LEFT JOIN Offices ON Offices.Id = CandidatePreferredOfficeLocations.OfficeId
+GROUP BY CandidatePreferredOfficeLocations.CandidateProfileInformationId) AS o ON o.cpId = cp.Id
+LEFT JOIN Countries c ON c.Id = cp.CountryId
     WHERE cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%'  
