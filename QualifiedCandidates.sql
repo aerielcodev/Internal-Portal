@@ -13,7 +13,9 @@ END AS Gender,
     cp.Created,     
     o.offices AS 'Preferred Office',
     c.Name AS Country,  
-    c.Code AS CountryCode
+    c.Code AS CountryCode,
+    cp.City,
+    cp.ZipCode
 FROM CandidateProfileInformations cp 
 LEFT JOIN CandidateStatuses s ON s.Id = cp.CandidateStatusId 
 LEFT JOIN (     
