@@ -12,6 +12,9 @@ END AS Gender,
     r.recruiter AS Recruiter,     
     cp.Created,     
     o.offices AS 'Preferred Office',
+    qPosn.posn AS 'Qualified Positions',
+    qPosn.types AS 'Qualified Types',
+    qPosn.teams AS 'Qualified Teams',
     c.Name AS Country,  
     c.Code AS CountryCode,
     cp.City,
@@ -31,5 +34,17 @@ LEFT JOIN (
     FROM CandidatePreferredOfficeLocations
     LEFT JOIN Offices ON Offices.Id = CandidatePreferredOfficeLocations.OfficeId
 GROUP BY CandidatePreferredOfficeLocations.CandidateProfileInformationId) AS o ON o.cpId = cp.Id
+LEFT JOIN (
+    SELECT
+        CandidateProfileInformationId,
+        string_agg(jp.Name,', ') AS posn,
+        string_agg(jt.Name,', ') AS types,
+        string_agg(jteam.Name,', ') AS teams
+  FROM CandidateQualifiedPositions qp
+  INNER JOIN JobPositions jp ON jp.Id = qp.JobPositionId
+  INNER JOIN JobTypes jt ON jt.Id = jp.JobTypeId
+  INNER JOIN JobTeams jteam ON jteam.Id = jt.JobTeamId
+  GROUP BY CandidateProfileInformationId
+) AS qPosn ON qPosn.CandidateProfileInformationId = cp.Id
 LEFT JOIN Countries c ON c.Id = cp.CountryId
     WHERE cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%'  
