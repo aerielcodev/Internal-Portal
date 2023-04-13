@@ -47,4 +47,5 @@ LEFT JOIN (
   GROUP BY CandidateProfileInformationId
 ) AS qPosn ON qPosn.CandidateProfileInformationId = cp.Id
 LEFT JOIN Countries c ON c.Id = cp.CountryId
-    WHERE cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%'  
+    WHERE (cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%')
+    AND (cp.FirstName NOT LIKE '%test%'  AND  cp.LastName NOT LIKE '%test%') 
