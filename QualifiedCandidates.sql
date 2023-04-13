@@ -15,6 +15,7 @@ END AS Gender,
     qPosn.posn AS 'Qualified Positions',
     qPosn.types AS 'Qualified Types',
     qPosn.teams AS 'Qualified Teams',
+    st.Name AS State,
     c.Name AS Country,  
     c.Code AS CountryCode,
     cp.City,
@@ -47,5 +48,6 @@ LEFT JOIN (
   GROUP BY CandidateProfileInformationId
 ) AS qPosn ON qPosn.CandidateProfileInformationId = cp.Id
 LEFT JOIN Countries c ON c.Id = cp.CountryId
+LEFT JOIN States st ON st.Id = cp.StateId
     WHERE (cp.FirstName NOT LIKE '%demo%'  AND  cp.LastName NOT LIKE '%demo%')
     AND (cp.FirstName NOT LIKE '%test%'  AND  cp.LastName NOT LIKE '%test%') 
