@@ -19,7 +19,7 @@ SELECT
     r.subCat AS 'Offboarding SubCategory',
     o.Note AS 'Offboarding Note',
     emp.Location AS 'Assigned Office',
-    emp.Name AS Country,
+    coalesce(candidateLoc.country,emp.Name) AS Country,
     lRate.Id AS lRateId
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
@@ -31,7 +31,8 @@ LEFT JOIN (
     SELECT 
         emp.CodevId,
         upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS teamMember,
-        e.Id, 
+        e.Id,
+        e.CandidateProfileInformationId, 
         ofc.Location,
         co.Name
     FROM Employees e 
@@ -39,6 +40,19 @@ LEFT JOIN (
     LEFT JOIN EmployeeHRReferences ehr ON ehr.Id = e.EmployeeHrReferenceId
     LEFT JOIN Offices AS ofc ON ofc.Id = ehr.OfficeId
     LEFT JOIN Countries AS co ON co.Id = ofc.CountryId) emp ON emp.Id = ce.EmployeeId
+LEFT JOIN (
+    SELECT
+        cp.Id,
+        st.Name AS 'state',
+        c.Name AS country,  
+        c.Code AS countryCode,
+        cp.City AS city,
+    cp.ZipCode
+    FROM CandidateProfileInformations cp 
+    INNER JOIN Countries c ON c.Id = cp.CountryId
+    INNER JOIN States st ON st.Id = cp.StateId
+) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
+
 LEFT JOIN EmployeeOffboardings o ON o.CustomerEmployeeId = ce.Id
 LEFT JOIN (
     SELECT 
