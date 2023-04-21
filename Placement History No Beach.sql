@@ -39,7 +39,8 @@ LEFT JOIN (
     INNER JOIN UserDetails emp ON emp.UserId = e.UserId
     LEFT JOIN EmployeeHRReferences ehr ON ehr.Id = e.EmployeeHrReferenceId
     LEFT JOIN Offices AS ofc ON ofc.Id = ehr.OfficeId
-    LEFT JOIN Countries AS co ON co.Id = ofc.CountryId) emp ON emp.Id = ce.EmployeeId
+    LEFT JOIN EmployeeAddresses ea ON ea.EmployeeId = e.Id
+    LEFT JOIN Countries AS co ON co.Id = ea.CountryId) emp ON emp.Id = ce.EmployeeId
 LEFT JOIN (
     SELECT
         cp.Id,
