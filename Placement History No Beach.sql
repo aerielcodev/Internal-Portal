@@ -43,16 +43,14 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT
         cp.Id,
-        st.Name AS 'state',
+        cp.State,
         c.Name AS country,  
         c.Code AS countryCode,
         cp.City AS city,
-    cp.ZipCode
+        cp.ZipCode
     FROM CandidateProfileInformations cp 
     INNER JOIN Countries c ON c.Id = cp.CountryId
-    INNER JOIN States st ON st.Id = cp.StateId
 ) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
-
 LEFT JOIN EmployeeOffboardings o ON o.CustomerEmployeeId = ce.Id
 LEFT JOIN (
     SELECT 
