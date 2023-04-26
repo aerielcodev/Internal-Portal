@@ -2,6 +2,7 @@
 SELECT
     ed.Id,
     ed.EmployeeId,
+    er.Name AS EmployeeReason,
     ed.Reason,
     ed.Created,
     cb.FirstName + ' ' + cb.LastName AS CreatedBy,
