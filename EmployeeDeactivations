@@ -1,0 +1,13 @@
+/*displays the reason why we're deactivating a team member's profile in the Internal Portal*/
+SELECT
+    ed.Id,
+    ed.EmployeeId,
+    ed.Reason,
+    ed.Created,
+    cb.FirstName + ' ' + cb.LastName AS CreatedBy,
+    mb.FirstName + ' ' + mb.LastName AS LastModifiedBy,
+    ed.LastModified
+FROM EmployeeDeactivations ed
+INNER JOIN EmployeeDeactivationReasons er ON er.Id = ed.EmployeeDeactivationReasonId
+INNER JOIN UserDetails AS cb ON  cb.UserId = ed.CreatedBy
+LEFT JOIN UserDetails AS mb ON  mb.UserId = ed.LastModifiedBy
