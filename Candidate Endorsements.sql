@@ -1,5 +1,5 @@
 /*List of all endrosed candidates for job openings. Job Opening Information is not available on this table. */
-SELECT
+SELECT DISTINCT
     jc.Id Id,
     jc.EmployeeId,
     jc.CandidateId,
@@ -19,7 +19,7 @@ SELECT
     jc.Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
-    d.FirstName + ' ' + d.LastName AS 'Declined By',
+    d.name AS 'Declined By',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.InitialInterviewRequestDate,
     jc.JobOfferExtended,
@@ -49,7 +49,7 @@ LEFT JOIN (
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
 LEFT JOIN NotAFitCategoryTypes naft ON naft.Id = jc.NotAFitCategoryTypeId
 LEFT JOIN UserDetails eb ON eb.UserId = jc.CreatedBy /*user who endorsed the candidate*/ 
-LEFT JOIN CustomerUsers d ON d.UserId = jc.DeclinedBy
+LEFT JOIN (SELECT DISTINCT UserId, FirstName + ' ' + LastName AS name FROM CustomerUsers WHERE Status = 1)  d ON d.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 
