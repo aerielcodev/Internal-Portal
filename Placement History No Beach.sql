@@ -20,7 +20,9 @@ SELECT
     o.Note AS 'Offboarding Note',
     emp.Location AS 'Assigned Office',
     coalesce(candidateLoc.country,emp.Name) AS Country,
-    lRate.Id AS lRateId
+    lRate.Id AS lRateId,
+    cb.FirstName + ' ' + cb.LastName AS CreatedBy,
+    mb.FirstName + ' ' + mb.LastName AS ModifiedBy
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -68,6 +70,8 @@ OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate DESC
     ) AS lRate
 LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
+LEFT JOIN UserDetails cb ON cb.UserId = ce.CreatedBy
+LEFT JOIN UserDetails mb ON mb.UserId = ce.LastModifiedBy
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
