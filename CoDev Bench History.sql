@@ -7,7 +7,7 @@ SELECT
     c.CompanyName,
     ce.DateStart,
     ce.DateEnd,
-    lRate.NewRate AS 'Latest Rate',
+    coalesce(lRate.NewRate,lRate2.NewRate) AS 'Latest Rate',
     ePosn.teams AS 'Qualified Teams',
     ePosn.types AS 'Qualified Types',
     ePosn.posn AS 'Qualified Positions',
@@ -33,6 +33,9 @@ LEFT JOIN (
 OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE CustomerEmployeeId = ce.Id ORDER BY EffectiveDate DESC
     ) AS lRate
+OUTER APPLY (
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate DESC
+    ) AS lRate2
 WHERE c.Id = 1 AND ce.IsDeleted = 0
 AND (emp.FirstName NOT LIKE '%demo%'  AND  emp.FirstName NOT LIKE '%demo%')
 ORDER BY ce.DateStart DESC
