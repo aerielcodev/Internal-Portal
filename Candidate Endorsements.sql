@@ -19,9 +19,9 @@ SELECT DISTINCT
     jc.Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
-    ir.name + ' (' + ir.CompanyName + ')' AS 'Interview Requested By',
+    ir.name AS 'Interview Requested By',
     jc.CustomerNote,
-    cxNote.name + ' (' + cxNote.CompanyName + ')' AS 'Customer Note Added By',    
+    cxNote.name AS 'Customer Note Added By',    
     d.name AS 'Declined By',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.InitialInterviewRequestDate,
@@ -63,19 +63,15 @@ LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 LEFT JOIN (
     SELECT DISTINCT 
         CustomerUsers.UserId, 
-        FirstName + ' ' + LastName AS name,
-        Customers.CompanyName
+        FirstName + ' ' + LastName AS name
     FROM CustomerUsers
-    LEFT JOIN Customers ON Customers.Id = CustomerUsers.CustomerId
     WHERE CustomerUsers.Status = 1
     )  cxNote ON cxNote.UserId = jc.CustomerNoteAddedBy
 LEFT JOIN (
     SELECT DISTINCT 
         CustomerUsers.UserId, 
-        FirstName + ' ' + LastName AS name,
-        Customers.CompanyName
+        FirstName + ' ' + LastName AS name
     FROM CustomerUsers
-    LEFT JOIN Customers ON Customers.Id = CustomerUsers.CustomerId
     WHERE CustomerUsers.Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
