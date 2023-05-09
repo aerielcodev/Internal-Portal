@@ -19,6 +19,9 @@ SELECT DISTINCT
     jc.Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
+    ir.name + ' (' + ir.CompanyName + ')' AS 'Interview Requested By',
+    jc.CustomerNote,
+    cxNote.name + ' (' + cxNote.CompanyName + ')' AS 'Customer Note Added By',    
     d.name AS 'Declined By',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.InitialInterviewRequestDate,
@@ -29,7 +32,7 @@ SELECT DISTINCT
     jc.JobOpeningId AS JobOpeningId,
     jop.Id AS JobOpeningPositionId,
     jc.LastModified,
-    jc.InterviewRequestedBy AS 'Interview Requested By'
+    jc.InterviewRequestedBy
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -49,10 +52,35 @@ LEFT JOIN (
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
 LEFT JOIN NotAFitCategoryTypes naft ON naft.Id = jc.NotAFitCategoryTypeId
 LEFT JOIN UserDetails eb ON eb.UserId = jc.CreatedBy /*user who endorsed the candidate*/ 
-LEFT JOIN (SELECT DISTINCT UserId, FirstName + ' ' + LastName AS name FROM CustomerUsers WHERE Status = 1)  d ON d.UserId = jc.DeclinedBy
+LEFT JOIN (
+    SELECT DISTINCT 
+        UserId, 
+        FirstName + ' ' + LastName AS name
+    FROM CustomerUsers
+    WHERE CustomerUsers.Status = 1
+    )  d ON d.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
+LEFT JOIN (
+    SELECT DISTINCT 
+        CustomerUsers.UserId, 
+        FirstName + ' ' + LastName AS name,
+        Customers.CompanyName
+    FROM CustomerUsers
+    LEFT JOIN Customers ON Customers.Id = CustomerUsers.CustomerId
+    WHERE CustomerUsers.Status = 1
+    )  cxNote ON cxNote.UserId = jc.CustomerNoteAddedBy
+LEFT JOIN (
+    SELECT DISTINCT 
+        CustomerUsers.UserId, 
+        FirstName + ' ' + LastName AS name,
+        Customers.CompanyName
+    FROM CustomerUsers
+    LEFT JOIN Customers ON Customers.Id = CustomerUsers.CustomerId
+    WHERE CustomerUsers.Status = 1
+    )  ir ON ir.UserId = jc.InterviewRequestedBy
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 
  (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' ) 
   AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
+
 
