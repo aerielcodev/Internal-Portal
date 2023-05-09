@@ -7,6 +7,7 @@ SELECT
     c.CompanyName,
     ce.DateStart,
     ce.DateEnd,
+    lRate.NewRate AS 'Latest Rate',
     ePosn.teams AS 'Qualified Teams',
     ePosn.types AS 'Qualified Types',
     ePosn.posn AS 'Qualified Positions',
@@ -29,6 +30,9 @@ LEFT JOIN (
   INNER JOIN JobTeams jteam ON jteam.Id = jt.JobTeamId
   GROUP BY EmployeeId
 ) AS ePosn ON ePosn.EmployeeId = ce.EmployeeId
+OUTER APPLY (
+    SELECT TOP 1 * FROM RateIncreases WHERE CustomerEmployeeId = ce.Id ORDER BY EffectiveDate DESC
+    ) AS lRate
 WHERE c.Id = 1 AND ce.IsDeleted = 0
 AND (emp.FirstName NOT LIKE '%demo%'  AND  emp.FirstName NOT LIKE '%demo%')
-ORDER BY [Team Member] ASC
+ORDER BY ce.DateStart DESC
