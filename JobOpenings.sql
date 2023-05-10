@@ -21,7 +21,8 @@ SELECT
     j.Budget AS Budget,
     jon.Number AS 'Job Opening Number',
     t.Name AS 'Team Name',
-    r.recruiter AS Recruiter,
+    ps.placementSup AS 'Placement Supervisor',
+    NULL AS Recruiter,  /*placeholder while waiting for Recruiter field*/
     ofc.location AS 'Office Location',
     CASE
         WHEN j.DifficultyId = 1 THEN 'Easy'
@@ -61,8 +62,8 @@ LEFT JOIN RateIncreases ri ON ri.EmployeeId = ce.EmployeeId AND ri.EffectiveDate
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') recruiter
+        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
-GROUP BY Employees.Id) AS r ON  r.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
+GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
 WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' )/**281 is the dummy customer*/ 
