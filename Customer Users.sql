@@ -1,13 +1,14 @@
 SELECT DISTINCT
       u.Id,
-      u.UserId,
-      u.Email,
-      u.FirstName + ' ' + u.LastName AS Name,
+      ud.UserId,
+      ud.Email,
+      ud.FirstName + ' ' + ud.LastName AS Name,
       c.CompanyName AS Customer,
       cr.Name AS 'Role Name',
-      u.[Status],
+      ud.[Status],
       u.IsActive
   FROM CustomerUsers u
+  INNER JOIN CustomerUserDetails ud ON u.CustomerUserDetailsId = ud.Id
   LEFT JOIN Customers c ON c.Id = u.CustomerId
   LEFT JOIN CustomerUserRoles cr ON cr.Id = u.CustomerUserRoleId
-  WHERE (u.FirstName + ' ' + u.LastName IS NOT NULL) AND (u.FirstName + ' ' + u.LastName != ' ') AND u.CustomerId != 281
+  WHERE (ud.FirstName + ' ' + ud.LastName IS NOT NULL) AND (ud.FirstName + ' ' + ud.LastName != ' ') AND u.CustomerId != 281

@@ -13,14 +13,13 @@ SELECT DISTINCT
     END AS Urgency,
     t.Name AS Team,
     r.DueDate,
-    coalesce(cb.FirstName + ' ' + cb.LastName,cu.FirstName + ' ' + cu.LastName) AS 'Created By',
+    coalesce(cb.FirstName + ' ' + cb.LastName,cud.FirstName + ' ' + cud.LastName) AS 'Created By',
     r.CreatedBy,
     r.Created,
      ud.FirstName + ' ' + ud.LastName AS 'Resolved By',
      mb.FirstName + ' ' + mb.LastName AS 'Last Modified By',
     grt.Created AS 'Resolution',
     'General Request' AS Category
-   
 FROM GeneralRequests r
 LEFT JOIN GeneralRequestThreads grt ON grt.GeneralRequestId = r.Id AND grt.GeneralRequestThreadType = 2
 LEFT JOIN Customers cx ON cx.Id = r.CustomerId
@@ -29,7 +28,7 @@ LEFT JOIN Teams t ON t.Id = r.TeamId
 LEFT JOIN UserDetails ud ON ud.UserId = grt.CreatedBy
 LEFT JOIN UserDetails cb ON cb.UserId = r.CreatedBy
 LEFT JOIN UserDetails mb ON mb.UserId = r.LastModifiedBy
-LEFT JOIN CustomerUsers cu ON cu.UserId = r.CreatedBy
+LEFT JOIN CustomerUserDetails cud ON cud.UserId = r.CreatedBy
 LEFT JOIN (
     SELECT
         GeneralRequestMembers.GeneralRequestId AS genReqId,
@@ -54,7 +53,7 @@ SELECT DISTINCT
     END,
     t.Name,
     c.DueDate,
-    coalesce(cb.FirstName + ' ' + cb.LastName,cu.FirstName + ' ' + cu.LastName),
+    coalesce(cb.FirstName + ' ' + cb.LastName,cud.FirstName + ' ' + cud.LastName),
     c.CreatedBy,
     c.Created,
      ud.FirstName + ' ' + ud.LastName ,
@@ -70,7 +69,7 @@ LEFT JOIN Teams t ON t.Id = c.TeamId
 LEFT JOIN UserDetails ud ON ud.UserId = cct.CreatedBy
 LEFT JOIN UserDetails cb ON cb.UserId = c.CreatedBy
 LEFT JOIN UserDetails mb ON mb.UserId = c.LastModifiedBy
-LEFT JOIN CustomerUsers cu ON cu.UserId = c.CreatedBy
+LEFT JOIN CustomerUserDetails cud ON cud.UserId = c.CreatedBy
 LEFT JOIN (
     SELECT
         CustomerConcernEmployees.CustomerConcernId AS concernId,

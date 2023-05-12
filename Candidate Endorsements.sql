@@ -56,23 +56,23 @@ LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
         FirstName + ' ' + LastName AS name
-    FROM CustomerUsers
-    WHERE CustomerUsers.Status = 1
+    FROM CustomerUserDetails
+    WHERE Status = 1
     )  d ON d.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 LEFT JOIN (
     SELECT DISTINCT 
-        CustomerUsers.UserId, 
+        UserId, 
         FirstName + ' ' + LastName AS name
-    FROM CustomerUsers
-    WHERE CustomerUsers.Status = 1
+    FROM CustomerUserDetails
+    WHERE Status = 1
     )  cxNote ON cxNote.UserId = jc.CustomerNoteAddedBy
 LEFT JOIN (
     SELECT DISTINCT 
-        CustomerUsers.UserId, 
+        UserId, 
         FirstName + ' ' + LastName AS name
-    FROM CustomerUsers
-    WHERE CustomerUsers.Status = 1
+    FROM CustomerUserDetails
+    WHERE Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 

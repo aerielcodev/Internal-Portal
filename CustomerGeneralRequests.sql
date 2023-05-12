@@ -13,8 +13,7 @@ SELECT DISTINCT
     r.CreatedBy,
     r.Created,
      ud.FirstName + ' ' + ud.LastName AS 'Resolved By',
-    grt.Created AS 'Resolution Date'
-   
+    grt.Created AS 'Resolution Date'  
 FROM GeneralRequests r
 LEFT JOIN GeneralRequestThreads grt ON grt.GeneralRequestId = r.Id AND grt.GeneralRequestThreadType = 2
 LEFT JOIN Customers cx ON cx.Id = r.CustomerId
