@@ -13,11 +13,11 @@ pto.DateTo AS 'Date To',
 pto.LeaveCount AS 'Leave Qty', 
 pto.ApprovalDate AS 'Approval Date' ,
 CASE
-WHEN c.userId IS NULL
+WHEN cu.UserId IS NULL
 THEN app.FirstName + ' ' + app.LastName
-ELSE c.Name
+ELSE cu.FirstName + ' ' + cu.LastName
 END AS Approver,
-c.userId AS 'Customer UserId'
+cu.UserId AS 'Customer UserId'
 FROM [dbo].[Ptos] pto 
 LEFT JOIN [dbo].[FilingTypes] ft ON ft.Id = pto.FilingTypeId 
 LEFT JOIN [dbo].[PtoStatuses] s ON s.Id = pto.StatusId 
@@ -26,9 +26,5 @@ INNER JOIN Employees e ON e.Id = pto.EmployeeId
 INNER JOIN UserDetails ud ON ud.UserId = e.UserId 
 LEFT JOIN EmployeeHRReferences hr ON hr.Id = e.EmployeeHrReferenceId
 LEFT JOIN UserDetails app ON app.UserId = pto.ApprovalBy
-LEFT JOIN 
-(SELECT u.FirstName + ' ' + u.LastName AS Name,
-l.UserId AS userId
-FROM CustomerPortalLogins l
-LEFT JOIN CustomerUsers u ON u.UserId = l.UserId) c ON c.userId = pto.ApprovalBy
+LEFT JOIN CustomerUserDetails cu ON cu.UserId = pto.ApprovalBy
 ORDER BY Id DESC
