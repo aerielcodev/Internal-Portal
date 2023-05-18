@@ -1,6 +1,6 @@
 SELECT     
-    cp.Id AS 'Id',     
-    trim(cp.FirstName) + ' ' + trim(cp.LastName) AS Name,     
+    cp.Id AS 'Id',   
+    trim(REPLACE(cp.FirstName,char(9),'')) + ' ' + trim(cp.LastName) AS Name,     
     s.Name AS Status,     
 CASE         
     WHEN cp.GenderId  = 1 THEN 'Male'         
@@ -53,4 +53,5 @@ LEFT JOIN (
 ) AS qPosn ON qPosn.CandidateProfileInformationId = cp.Id
 LEFT JOIN Countries c ON c.Id = cp.CountryId
 LEFT JOIN States st ON st.Id = cp.StateId
-WHERE NOT (cp.FirstName LIKE '%(demo|test)%' OR cp.LastName LIKE '%(demo|test)%')
+WHERE (cp.FirstName NOT LIKE '%demo%' AND cp.FirstName NOT LIKE '%test%' AND cp.LastName NOT LIKE '%demo%')
+ORDER BY 'Qualified Date' DESC
