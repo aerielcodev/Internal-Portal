@@ -32,7 +32,8 @@ SELECT
     j.IsCustomerCreated AS IsCustomerCreated,
     j.Created AS Created,
     j.CreatedBy AS CreatedByUserId,
-    jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate
+    jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
+    j.RecruiterId AS placementSupervisorId
 FROM JobOpeningNumbers jon
 LEFT JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
