@@ -22,7 +22,8 @@ END AS Gender,
     c.Name AS Country,  
     c.Code AS CountryCode,
     cp.City,
-    cp.ZipCode
+    cp.ZipCode,
+    cp.RecruiterId
 FROM CandidateProfileInformations cp 
 LEFT JOIN CandidateStatuses s ON s.Id = cp.CandidateStatusId 
 LEFT JOIN (     
