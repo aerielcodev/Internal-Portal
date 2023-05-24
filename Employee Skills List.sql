@@ -1,4 +1,5 @@
 SELECT
+    es.Id AS employeeSkillsId,
     es.EmployeeId,
     emp.CodevId AS CoDevId,
     trim(emp.FirstName) + ' ' + trim(emp.LastName) AS 'Team Member',
