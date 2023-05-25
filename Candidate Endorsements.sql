@@ -14,9 +14,9 @@ SELECT DISTINCT
         WHEN jc.Recommendation = 1 THEN 'Endorse'
         WHEN jc.Recommendation = 2 THEN 'Do Not Endorse'
         WHEN jc.Recommendation = 3 THEN 'Not A Fit'
-    END AS Recommendation,    
-    naft.Name AS 'Not A Fit Category',
-    jc.Note,
+    END AS Recommendation,  
+    coalesce(jft.Name,naft.Name) AS 'Not A Fit Category',
+    coalesce(jf.Details,jc.Note) AS Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
     ir.name AS 'Interview Requested By',
@@ -52,6 +52,8 @@ LEFT JOIN (
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
 LEFT JOIN NotAFitCategoryTypes naft ON naft.Id = jc.NotAFitCategoryTypeId
 LEFT JOIN UserDetails eb ON eb.UserId = jc.CreatedBy /*user who endorsed the candidate*/ 
+LEFT JOIN JobOpeningRecommendationFeedbacks jf ON jf.Id = jc.JobOpeningRecommendationFeedbackId
+LEFT JOIN JobOpeningRecommendationFeedbackTypes jft ON jft.Id = jf.RecommendationFeedbackTypeId
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
