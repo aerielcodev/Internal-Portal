@@ -8,7 +8,10 @@ SELECT DISTINCT
         WHEN jc.CandidateId IS NOT NULL THEN c.FirstName + ' ' + c.LastName
         ELSE e.FirstName + ' ' + e.LastName
     END AS Name,
-    js.Name AS 'Job Opening Endorsement Status',
+    CASE
+        WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not A Fit'
+        ELSE js.Name
+    END  AS 'Job Opening Endorsement Status',
     jc.Created AS Created,
     CASE
         WHEN jc.Recommendation = 1 THEN 'Endorse'
