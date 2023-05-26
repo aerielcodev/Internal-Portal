@@ -10,6 +10,10 @@ SELECT DISTINCT
     END AS Name,
     CASE
         WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not A Fit'
+        WHEN js.Id = 10 THEN 'JO Requested' 
+        WHEN js.Id = 6 THEN 'JO Extended' 
+        WHEN js.Id = 5 THEN 'JO Made' 
+        WHEN js.Id = 8 THEN 'JO Declined'
         ELSE js.Name
     END  AS 'Job Opening Endorsement Status',
     jc.Created AS Created,
@@ -25,7 +29,7 @@ SELECT DISTINCT
     ir.name AS 'Interview Requested By',
     jc.CustomerNote AS 'Customer Visible Note',
     cxNote.name AS 'Customer Visible Note Added By',    
-    d.name AS 'Declined By',
+    COALESCE(d.name,CONCAT(d2.FirstName,' ',d2.LastName)) AS 'Declined By',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.InitialInterviewRequestDate,
     jc.JobOfferExtended,
@@ -35,7 +39,8 @@ SELECT DISTINCT
     jc.JobOpeningId AS JobOpeningId,
     jop.Id AS JobOpeningPositionId,
     jc.LastModified,
-    jc.InterviewRequestedBy
+    jc.InterviewRequestedBy,
+    d.Email AS declinerEmail
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -60,10 +65,11 @@ LEFT JOIN JobOpeningRecommendationFeedbackTypes jft ON jft.Id = jf.Recommendatio
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
-        FirstName + ' ' + LastName AS name
+        FirstName + ' ' + LastName AS name,
+        Email
     FROM CustomerUserDetails
-    WHERE Status = 1
     )  d ON d.UserId = jc.DeclinedBy
+LEFT JOIN UserDetails d2 ON d2.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 LEFT JOIN (
     SELECT DISTINCT 
