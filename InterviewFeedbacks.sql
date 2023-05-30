@@ -26,5 +26,5 @@ LEFT JOIN (
     FROM CustomerUserDetails
     )  cb ON cb.UserId = jcs.ChangedBy
 LEFT JOIN UserDetails cb2 ON cb2.UserId = jcs.ChangedBy
-WHERE ifc.Name IS NOT NULL and jcs.JobOpeningCandidateId = 1961
+WHERE ifc.Name IS NOT NULL
 ORDER by jcs.DateStatusUpdated asc
