@@ -35,7 +35,7 @@ SELECT DISTINCT
     jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
     j.RecruiterId AS placementSupervisorId
 FROM JobOpeningNumbers jon
-LEFT JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
+INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
 LEFT JOIN JobOpeningStatuses js ON js.Id = jop.JobOpeningStatusId
 LEFT JOIN JobPositions jp ON jp.Id = j.JobPositionId
@@ -51,7 +51,7 @@ INNER JOIN Offices ON Offices.Id = JobOpeningLocations.OfficeId
 GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
 LEFT JOIN Teams t ON t.Id = j.TeamId
-LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id
+LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.IsDeleted = 0
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
