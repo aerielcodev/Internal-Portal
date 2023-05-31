@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     j.Id AS Id,
     c.id AS CustomerId,
     jop.Id AS JobOpeningPositionId,
