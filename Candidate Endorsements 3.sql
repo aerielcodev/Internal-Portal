@@ -1,10 +1,9 @@
 SELECT 
     jcs.Id,
     jcs.JobOpeningCandidateId,
-    jos.Name,
-    ifc.Name AS 'Interview Feedback Category',
+    jos.Name AS 'Job Opening Endorsement Status',
     jcs.DateStatusUpdated,
-    coalesce(cb.Name,CONCAT(cb2.FirstName,' ',cb2.LastName)) AS UpdatedBy,
+    COALESCE(CONCAT(cb2.FirstName,' ',cb2.LastName),cb.Name) AS UpdatedBy,
     jop.Id AS JobOpeningPositionId,
     jc.JobOpeningId,
     ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated) AS rn
