@@ -1,11 +1,13 @@
-
 SELECT 
     jcs.Id,
     jcs.JobOpeningCandidateId,
-    ifc.Name AS 'Interview Feedback Category',
-    jcif.Feedback,
+    CASE
+        WHEN jcs.RecommendationId = 1 THEN 'Endorse'
+        WHEN jcs.RecommendationId = 2 THEN 'Do Not Endorse'
+        WHEN jcs.RecommendationId = 3 THEN 'Not A Fit'
+    END AS Recommendation, 
     jcs.DateStatusUpdated,
-    COALESCE(CONCAT(cb2.FirstName,' ',cb2.LastName),cb.Name) AS UpdatedBy,
+    COALESCE(cb.Name,CONCAT(cb2.FirstName,' ',cb2.LastName)) AS UpdatedBy,
     jop.Id AS JobOpeningPositionId,
     jc.JobOpeningId,
     ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated) AS rn
@@ -14,11 +16,7 @@ INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
 INNER JOIN JobOpeningCandidates jc ON jc.JobOpeningId  = j.Id
 INNER JOIN dbo.JobOpeningCandidateEndorsementStatusChangeDates jcs ON jcs.JobOpeningCandidateId = jc.Id
-LEFT JOIN InterviewFeedbackActionCategoryTypes ifc ON ifc.Id = jcs.InterviewFeedbackActionCategoryTypeId
-LEFT JOIN JobOpeningCandidateInterviewFeedbacks jcif ON 
-(jcif.JobOpeningCandidateId = jcs.JobOpeningCandidateId) 
-AND (CAST(jcif.Created AS DATE) = CAST(jcs.DateStatusUpdated AS DATE)  
-AND jcif.CreatedBy = jcs.ChangedBy AND jcif.InterviewFeedbackActionCategoryTypeId = jcs.InterviewFeedbackActionCategoryTypeId )
+LEFT JOIN NotAFitCategoryTypes nct ON nct.Id = jcs.NotAFitCategoryTypeId
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
@@ -26,5 +24,5 @@ LEFT JOIN (
     FROM CustomerUserDetails
     )  cb ON cb.UserId = jcs.ChangedBy
 LEFT JOIN UserDetails cb2 ON cb2.UserId = jcs.ChangedBy
-WHERE ifc.Name IS NOT NULL
+WHERE jcs.RecommendationId IS NOT NULL AND jcs.NotAFitCategoryTypeId IS NULL 
 ORDER by jcs.DateStatusUpdated asc
