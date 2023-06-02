@@ -6,7 +6,7 @@ SELECT
     ce.jobTitle AS 'Job Title',
     c.CompanyName,
     ce.DateStart,
-    ce.DateEnd,
+    coalesce(ce.DateEnd, e.DeletedDate) AS DateEnd,
     coalesce(lRate.NewRate,lRate2.NewRate) AS 'Latest Rate',
     ePosn.teams AS 'Qualified Teams',
     ePosn.types AS 'Qualified Types',
@@ -18,6 +18,7 @@ LEFT JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) m ON m.UserId = ce.LastModifiedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cb ON cb.UserId = ce.CreatedBy
+LEFT JOIN Employees e ON e.Id = ce.EmployeeId AND e.Status = 3
 LEFT JOIN (
     SELECT
         EmployeeId,
