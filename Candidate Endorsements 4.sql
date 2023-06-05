@@ -24,5 +24,5 @@ LEFT JOIN (
     FROM CustomerUserDetails
     )  cb ON cb.UserId = jcs.ChangedBy
 LEFT JOIN UserDetails cb2 ON cb2.UserId = jcs.ChangedBy
-WHERE jcs.RecommendationId IS NOT NULL AND jcs.NotAFitCategoryTypeId IS NULL 
+WHERE jcs.RecommendationId IS NOT NULL AND jcs.NotAFitCategoryTypeId IS NULL  and jcs.RecommendationId <> 1
 ORDER by jcs.DateStatusUpdated asc
