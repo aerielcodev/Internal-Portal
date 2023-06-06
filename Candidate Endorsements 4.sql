@@ -4,7 +4,7 @@ SELECT
     CASE
         WHEN jcs.RecommendationId = 1 THEN 'Endorse'
         WHEN jcs.RecommendationId = 2 THEN 'Do Not Endorse'
-        WHEN jcs.RecommendationId = 3 THEN 'Not A Fit'
+        WHEN jcs.RecommendationId = 3 THEN 'Not a Fit'
     END AS Recommendation, 
     jcs.DateStatusUpdated,
     COALESCE(cb.Name,CONCAT(cb2.FirstName,' ',cb2.LastName)) AS UpdatedBy,
