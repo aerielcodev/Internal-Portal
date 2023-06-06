@@ -9,7 +9,7 @@ SELECT DISTINCT
         ELSE e.FirstName + ' ' + e.LastName
     END AS Name,
     CASE
-        WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not A Fit'
+        WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not a Fit'
         WHEN js.Id = 10 THEN 'JO Requested' 
         WHEN js.Id = 6 THEN 'JO Extended' 
         WHEN js.Id = 5 THEN 'JO Made' 
