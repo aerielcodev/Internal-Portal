@@ -1,4 +1,4 @@
-SELECT 
+SELECT  DISTINCT
     jcs.Id,
     jcs.JobOpeningCandidateId,
     CASE

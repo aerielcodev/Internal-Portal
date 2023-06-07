@@ -26,7 +26,7 @@ SELECT DISTINCT
     coalesce(jf.Details,jc.Note) AS Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
-    ir.name AS 'Interview Requested By',
+    coalesce(ir.name,CONCAT(ir2.FirstName,' ',ir2.LastName)) AS 'Interview Requested By',
     jc.CustomerNote AS 'Customer Visible Note',
     cxNote.name AS 'Customer Visible Note Added By',    
     COALESCE(d.name,CONCAT(d2.FirstName,' ',d2.LastName)) AS 'Declined By',
@@ -85,9 +85,9 @@ LEFT JOIN (
     FROM CustomerUserDetails
     WHERE Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
+LEFT JOIN UserDetails ir2 ON ir2.UserId = jc.InterviewRequestedBy
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 
- (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' ) 
+ (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' )
   AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
-
 
