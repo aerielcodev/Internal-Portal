@@ -14,5 +14,5 @@ INNER JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
 INNER JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cb ON cb.UserId = ce.CreatedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) mb ON mb.UserId = ce.LastModifiedBy
-WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName LIKE 'codev%' OR c.CompanyName LIKE '%breakthrough%')
+WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName LIKE 'codev%' OR c.CompanyName LIKE '%breakthrough%') AND ce.IsDeleted = 0
 ORDER BY [Team Member] ASC
