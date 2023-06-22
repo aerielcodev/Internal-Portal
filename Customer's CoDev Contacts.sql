@@ -4,7 +4,7 @@ WITH cte AS (SELECT DISTINCT
         emp.Id AS EmployeeId,
         concat(emp.FirstName,' ',emp.LastName) AS Name,
         cast(cc.DateStart AS Date) AS DateStart,
-        IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),cast(cc.DateEnd AS Date)) AS DateEnd,
+        IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEnd,
         ct.Name AS Assignment,
         iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid
     FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
