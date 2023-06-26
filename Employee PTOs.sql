@@ -1,5 +1,6 @@
 SELECT DISTINCT
 pto.Id AS Id, 
+pto.EmployeeId,
 s.Name AS 'Status', 
 ud.Email AS Email, 
 ud.CodevId AS 'Employee Number', 
