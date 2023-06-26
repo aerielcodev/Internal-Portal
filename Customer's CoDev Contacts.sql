@@ -6,7 +6,8 @@ WITH cte AS (SELECT DISTINCT
         iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) AS DateStart,
         IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEnd,
         ct.Name AS Assignment,
-        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid
+        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid,
+        ROW_NUMBER() OVER(PARTITION BY cc.CustomerId,ct.Name ORDER BY iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) DESC) AS 'Contact RowNum'
     FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
     LEFT JOIN Customers c ON c.Id = cc.CustomerId
     LEFT JOIN (
