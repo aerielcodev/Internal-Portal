@@ -9,6 +9,7 @@ CASE
 END AS Gender,     
     isnull(cp.QualifiedDate,cp.Created) AS 'Qualified Date',   
     cp.Email,  
+    cp.ContactNumber,
     r.recruiter AS Recruiter,     
     cp.Created,     
     o.offices AS 'Preferred Office',
