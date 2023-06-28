@@ -63,7 +63,7 @@ LEFT JOIN RateIncreases ri ON ri.EmployeeId = ce.EmployeeId AND ri.EffectiveDate
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') placementSup
+        UPPER(string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',')) placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
