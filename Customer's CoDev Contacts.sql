@@ -4,10 +4,9 @@ WITH cte AS (SELECT DISTINCT
         emp.Id AS EmployeeId,
         concat(emp.FirstName,' ',emp.LastName) AS Name,
         iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) AS DateStart,
-        IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEnd,
+        IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEndTest,
         ct.Name AS Assignment,
-        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid,
-        ROW_NUMBER() OVER(PARTITION BY cc.CustomerId,ct.Name ORDER BY iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) DESC) AS 'Contact RowNum'
+        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid
     FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
     LEFT JOIN Customers c ON c.Id = cc.CustomerId
     LEFT JOIN (
@@ -27,6 +26,12 @@ WITH cte AS (SELECT DISTINCT
     ) AS lastP ON lastP.CustomerId = cc.CustomerId
     WHERE cc.CustomerId != 281 /*281 is the dummy customer's id*/)
 SELECT
-    *
+    *,
+    ROW_NUMBER() OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) ASC) AS 'Contact RowNum',
+    CASE
+        WHEN cte.DateEndTest IS NULL THEN NULL
+        WHEN DATEADD(day,1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC)) <> cte.DateStart THEN DATEADD(day,-1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC))
+    END
+     AS DateEnd
 FROM cte
 WHERE cte.isInvalid = 'N'
