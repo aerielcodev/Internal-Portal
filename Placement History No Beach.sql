@@ -1,3 +1,42 @@
+WITH cte_custContacts AS (
+    SELECT DISTINCT
+        cc.Id,
+        cc.CustomerId,
+        concat(emp.FirstName,' ',emp.LastName) AS Name,
+        cc.CustomerCodevContactTypeId,
+        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) AS DateStart,
+        IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEndTest,
+        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid
+    FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
+    LEFT JOIN Customers c ON c.Id = cc.CustomerId
+    LEFT JOIN (
+        SELECT 
+        emp.FirstName,
+        emp.LastName,
+        e.Id
+        FROM INTERNALSERVICEDB.dbo.Employees e 
+        INNER JOIN INTERNALSERVICEDB.dbo.UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = cc.EmployeeId
+    LEFT JOIN INTERNALSERVICEDB.dbo.CustomerCodevContactTypes ct ON ct.Id = cc.CustomerCodevContactTypeId
+    LEFT JOIN (
+        SELECT
+            max(DateEnd) AS endOfLastPlacement,
+            CustomerId
+        FROM CustomerEmployees
+        GROUP BY CustomerId
+    ) AS lastP ON lastP.CustomerId = cc.CustomerId
+),
+cte_result AS (
+    SELECT
+        *,
+    CASE
+        WHEN DateEndTest IS NULL THEN NULL
+        WHEN DATEADD(day,1,LAG(DateStart) OVER(PARTITION BY CustomerId,CustomerCodevContactTypeId ORDER BY cast(DateStart AS Date) DESC)) <> DateStart THEN DATEADD(day,-1,LAG(DateStart) OVER(PARTITION BY CustomerId,CustomerCodevContactTypeId ORDER BY cast(DateStart AS Date) DESC))
+    END
+     AS DateEnd
+    FROM cte_custContacts
+    WHERE isInvalid = 'N'
+) 
+
 SELECT
     ce.id,
     c.Id AS CustomerId,
@@ -8,6 +47,9 @@ SELECT
     emp.teamMember AS 'Team Member',
     ce.JobTitle AS 'Job Title',
     c.CompanyName,
+    csm.Name AS 'Customer Success Manager - Placement',
+    ae.Name AS 'Account Executive - Placement',
+    ts.Name AS 'Talent Supervisor - Placement',
     ce.DateStart,
     ce.DateEnd,
     ce.PartTimeDate,
@@ -71,6 +113,27 @@ OUTER APPLY (
 LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
 LEFT JOIN UserDetails cb ON cb.UserId = ce.CreatedBy
 LEFT JOIN UserDetails mb ON mb.UserId = ce.LastModifiedBy
+LEFT JOIN (
+    SELECT
+        *
+    FROM cte_result
+) AS ae ON ae.CustomerId = c.Id  AND ae.CustomerCodevContactTypeId = 1
+AND (ae.DateStart <= cast(ce.DateStart AS date) 
+AND (ae.DateEnd >= cast(ce.DateStart AS date) OR ae.DateEnd IS NULL))
+LEFT JOIN (
+    SELECT
+        *
+    FROM cte_result
+)  AS ts ON ts.CustomerId = c.Id  AND ts.CustomerCodevContactTypeId = 2
+AND (ts.DateStart  <= cast(ce.DateStart AS date) 
+AND (ts.DateEnd  >= cast(ce.DateStart AS date) OR ts.DateEnd IS NULL))
+LEFT JOIN (
+    SELECT
+        *
+    FROM cte_result
+)  AS  csm ON csm.CustomerId = c.Id AND csm.CustomerCodevContactTypeId = 3
+AND (csm.DateStart <= cast(ce.DateStart AS date) 
+AND (csm.DateEnd  >= cast(ce.DateStart AS date) OR csm.DateEnd IS NULL))
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
