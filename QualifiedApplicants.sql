@@ -1,7 +1,7 @@
 /*displays all applicants who are qualified and sent to the Active Pool tab*/
 SELECT
     a.Id AS ApplicantId,
-    cp.CandidateId,
+    cp.Id AS CandidateId,
     CONCAT(TRIM(a.FirstName),' ',TRIM(a.LastName)) AS Applicant,
     iif(cb.UserId IS NULL,a.CreatedBy,CONCAT(cb.FirstName,' ',cb.LastName)) AS CreatedBy,
     a.Created AS ApplicationDate,
