@@ -8,7 +8,8 @@ SELECT
     COALESCE(CONCAT(cb2.FirstName,' ',cb2.LastName),cb.Name) AS UpdatedBy,
     jop.Id AS JobOpeningPositionId,
     jc.JobOpeningId,
-    ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated DESC) AS rn
+    ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated DESC) AS rn,
+    jcif.LastModified
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
