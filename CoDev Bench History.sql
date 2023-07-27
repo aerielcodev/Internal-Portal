@@ -12,13 +12,15 @@ SELECT
     ePosn.types AS 'Qualified Types',
     ePosn.posn AS 'Qualified Positions',
     cb.FirstName + ' ' + cb.LastName AS 'Created By',
-    m.FirstName + ' ' + m.LastName AS 'Modified By'
+    m.FirstName + ' ' + m.LastName AS 'Modified By',
+    cs.Name AS 'Active Pool Status'
 FROM Customers c 
 LEFT JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
-LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
+LEFT JOIN (SELECT emp.*,e.Id, e.CandidateStatusId FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) m ON m.UserId = ce.LastModifiedBy
 LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) cb ON cb.UserId = ce.CreatedBy
 LEFT JOIN Employees e ON e.Id = ce.EmployeeId AND e.Status = 3
+LEFT JOIN CandidateStatuses cs ON cs.Id = emp.CandidateStatusId
 LEFT JOIN (
     SELECT
         EmployeeId,
