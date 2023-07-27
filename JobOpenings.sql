@@ -33,7 +33,9 @@ SELECT DISTINCT
     j.Created AS Created,
     j.CreatedBy AS CreatedByUserId,
     jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
-    j.RecruiterId AS placementSupervisorId
+    j.RecruiterId AS placementSupervisorId,
+    j.LastModified,
+    mb.lastModified AS 'Last Modified By'
 FROM JobOpeningNumbers jon
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -67,4 +69,10 @@ LEFT JOIN (
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
+LEFT JOIN (
+    SELECT
+        UserId,
+        concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) lastModified
+    FROM  UserDetails
+) AS mb ON  mb.UserId = j.LastModifiedBy
 WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
