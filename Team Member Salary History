@@ -1,0 +1,20 @@
+/*Grabs the salary history of Team Members regardless of the team member's profile.*/
+SELECT
+    es.Id AS employeeSalaryHistoryId,
+    ud.CodevId AS 'Employee Number',
+    CONCAT(ud.FirstName,' ',ud.LastName) AS 'Team Member',
+    es.BasePay AS Base,
+    es.Allowance,
+    es.EffectiveDate,
+    r.Name AS Reason,
+    es.Note,
+    CONCAT(cb.FirstName,' ',cb.LastName) AS 'Created By',
+    es.Created,
+    CONCAT(mb.FirstName,' ',mb.LastName) AS 'Modified By',
+    mb.LastModified
+FROM EmployeeSalaryHistories es
+JOIN Employees e ON e.Id = es.EmployeeId
+JOIN UserDetails ud ON ud.userId = e.userId
+LEFT JOIN UserDetails cb ON cb.userId = es.CreatedBy
+LEFT JOIN UserDetails mb ON mb.userId = es.LastModifiedBy
+LEFT JOIN RateIncreaseReasons r ON r.Id = es.ReasonId
