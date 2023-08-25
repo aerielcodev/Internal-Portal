@@ -30,6 +30,7 @@ SELECT DISTINCT
         WHEN j.DifficultyId = 3 THEN 'Hard'
     END AS Difficulty,
     j.IsCustomerCreated AS IsCustomerCreated,
+    COALESCE(cb.createdBy,CONCAT(cbc.createdByCustomer,' (',c.CompanyName,')')) AS 'Created By',
     j.Created AS Created,
     j.CreatedBy AS CreatedByUserId,
     jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
@@ -75,4 +76,14 @@ LEFT JOIN (
         concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) lastModified
     FROM  UserDetails
 ) AS mb ON  mb.UserId = j.LastModifiedBy
+LEFT JOIN (
+    SELECT DISTINCT
+        UserId,
+        concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) createdBy
+    FROM  UserDetails
+) AS cb ON cb.UserId = j.CreatedBy
+LEFT JOIN (SELECT DISTINCT
+    UserId,
+    concat(FirstName ,' ' ,LastName) AS createdByCustomer
+FROM CustomerUserDetails) cbc ON cbc.UserId = j.CreatedBy
 WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
