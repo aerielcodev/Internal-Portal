@@ -64,7 +64,9 @@ SELECT
     coalesce(candidateLoc.country,emp.Name) AS Country,
     lRate.Id AS lRateId,
     cb.FirstName + ' ' + cb.LastName AS CreatedBy,
-    mb.FirstName + ' ' + mb.LastName AS ModifiedBy
+    mb.FirstName + ' ' + mb.LastName AS ModifiedBy,
+    ce.Created,
+    ce.LastModified
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
