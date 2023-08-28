@@ -37,7 +37,7 @@ cte_result AS (
     WHERE isInvalid = 'N'
 ) 
 
-SELECT
+SELECT DISTINCT
     ce.id,
     c.Id AS CustomerId,
     jop.Id AS JobOpeningPositionId,
@@ -66,7 +66,10 @@ SELECT
     cb.FirstName + ' ' + cb.LastName AS CreatedBy,
     mb.FirstName + ' ' + mb.LastName AS ModifiedBy,
     ce.Created,
-    ce.LastModified
+    ce.LastModified,
+ol.Created AS 'Offboarding Log Date',
+ocb.FirstName + ' ' + ocb.LastName AS 'Offboarding Log Created By',
+omb.FirstName + ' ' + omb.LastName AS 'Offboarding Log Last Modified By'
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -136,6 +139,9 @@ LEFT JOIN (
 )  AS  csm ON csm.CustomerId = c.Id AND csm.CustomerCodevContactTypeId = 3
 AND (csm.DateStart <= cast(ce.DateStart AS date) 
 AND (csm.DateEnd  >= cast(ce.DateStart AS date) OR csm.DateEnd IS NULL))
+LEFT JOIN EmployeeOffboardings ol ON ol.CustomerEmployeeId = ce.Id
+LEFT JOIN UserDetails ocb ON ocb.UserId = ol.CreatedBy
+LEFT JOIN UserDetails omb ON omb.UserId = ol.LastModifiedBy
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
