@@ -57,8 +57,9 @@ SELECT DISTINCT
     jt.Name AS 'Job Opening Type',
     fRate.NewRate AS 'First Rate',
     lRate.NewRate AS 'Latest Rate',
-    oc.Name AS 'Offboarding Category',
-    r.subCat AS 'Offboarding SubCategory',
+    oc.Cat AS 'Offboarding Category',
+    oc.PrimCat AS 'Offboarding SubCategory',
+    r.subCat AS 'Offboarding Secondary SubCategory',
     o.Note AS 'Offboarding Note',
     emp.Location AS 'Assigned Office',
     coalesce(candidateLoc.country,emp.Name) AS Country,
@@ -67,7 +68,7 @@ SELECT DISTINCT
     mb.FirstName + ' ' + mb.LastName AS ModifiedBy,
     ce.Created,
     ce.LastModified,
-ol.Created AS 'Offboarding Log Date',
+o.Created AS 'Offboarding Log Date',
 ocb.FirstName + ' ' + ocb.LastName AS 'Offboarding Log Created By',
 omb.FirstName + ' ' + omb.LastName AS 'Offboarding Log Last Modified By'
 FROM dbo.JobOpeningNumbers jon 
@@ -101,14 +102,24 @@ LEFT JOIN (
     INNER JOIN Countries c ON c.Id = cp.CountryId
 ) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
 LEFT JOIN EmployeeOffboardings o ON o.CustomerEmployeeId = ce.Id
-LEFT JOIN (
+LEFT JOIN ( /*grabs the category, subcategory and the secondary subcategory */
     SELECT 
-    s2.OffboardingCategoryId,
-    s.EmployeeOffboardingId, 
-    STRING_AGG(s2.Name,';') AS subCat 
-FROM EmployeeOffboardingSubCategories s 
-INNER JOIN OffboardingSubCategories s2 ON s.OffboardingSubCategoryId = s2.Id GROUP BY s.EmployeeOffboardingId,s2.OffboardingCategoryId)  AS r ON r.EmployeeOffboardingId = o.Id
-LEFT JOIN OffboardingCategories oc ON oc.Id = r.OffboardingCategoryId
+        s.EmployeeOffboardingId,
+        oc.Name AS Cat,
+        s3.Name AS PrimCat
+    FROM EmployeeOffboardingSecondarySubCategories s 
+    INNER JOIN OffboardingSecondarySubCategories s2 ON s2.Id = s.OffboardingSecondarySubCategoryId
+    INNER JOIN OffboardingSubCategories s3 ON s3.Id = s2.SubCategoryId
+    INNER JOIN OffboardingCategories oc ON oc.Id = s3.OffboardingCategoryId
+    ) AS oc ON oc.EmployeeOffboardingId = o.Id
+LEFT JOIN (/*concatenates the offboarding's secondary subcategory*/
+    SELECT 
+        s.EmployeeOffboardingId,
+        STRING_AGG(s2.Name,' ; ') AS SubCat
+    FROM EmployeeOffboardingSecondarySubCategories s 
+    INNER JOIN OffboardingSecondarySubCategories s2 ON s2.Id = s.OffboardingSecondarySubCategoryId
+    GROUP BY s.EmployeeOffboardingId
+    ) AS r ON r.EmployeeOffboardingId = oc.EmployeeOffboardingId
 OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate ASC
     ) AS fRate
@@ -139,9 +150,8 @@ LEFT JOIN (
 )  AS  csm ON csm.CustomerId = c.Id AND csm.CustomerCodevContactTypeId = 3
 AND (csm.DateStart <= cast(ce.DateStart AS date) 
 AND (csm.DateEnd  >= cast(ce.DateStart AS date) OR csm.DateEnd IS NULL))
-LEFT JOIN EmployeeOffboardings ol ON ol.CustomerEmployeeId = ce.Id
-LEFT JOIN UserDetails ocb ON ocb.UserId = ol.CreatedBy
-LEFT JOIN UserDetails omb ON omb.UserId = ol.LastModifiedBy
+LEFT JOIN UserDetails ocb ON ocb.UserId = o.CreatedBy
+LEFT JOIN UserDetails omb ON omb.UserId = o.LastModifiedBy
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
