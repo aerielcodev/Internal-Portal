@@ -14,10 +14,10 @@ SELECT
     IIF(ub.FirstName IS NULL,ajp.CreatedBy,CONCAT(ub.FirstName,' ',ub.LastName)) AS 'Status Updated By'
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
-INNER JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
+LEFT JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
 LEFT JOIN JobPostings jp ON jp.Id = ap.JobPostingId
 LEFT JOIN CandidateProfileInformations cp ON cp.Id = ap.CandidateId
-LEFT JOIN ApplicantJobPostingProgresses ajp ON ajp.Id = ap.ProgressId
+LEFT JOIN ApplicantJobPostingProgresses ajp ON ajp.ApplicantJobPostingId = ap.Id
 LEFT JOIN ApplicationStages ast ON ast.Id = ajp.ApplicationStageId
 /*LEFT JOIN (     
     SELECT         
@@ -27,7 +27,7 @@ LEFT JOIN ApplicationStages ast ON ast.Id = ajp.ApplicationStageId
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId) AS r ON r.eId = cp.RecruiterId*/
     LEFT JOIN UserDetails ub ON ub.UserId = ajp.CreatedBy
 WHERE  
-    a.Created >= CONVERT(DATE,'2023-05-17') /*date v2 careers was launched*/
+    a.Created >= CONVERT(DATE,'2023-05-17') /*date v2 careers was launched*/ 
 AND
 (
         LOWER(a.FirstName) NOT LIKE '%test%'

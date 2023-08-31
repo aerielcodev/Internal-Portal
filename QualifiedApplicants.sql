@@ -4,13 +4,16 @@ SELECT
     cp.Id AS CandidateId,
     CONCAT(TRIM(a.FirstName),' ',TRIM(a.LastName)) AS Applicant,
     iif(cb.UserId IS NULL,a.CreatedBy,CONCAT(cb.FirstName,' ',cb.LastName)) AS CreatedBy,
-    a.Created AS ApplicationDate,
+    ap.DateApplied AS ApplicationDate,
     cp.QualifiedDate,
     r.recruiter AS Recruiter,     
-    DATEDIFF(day,a.Created,cp.QualifiedDate) AS 'Days from Application to Qualified'
+    jp.Title AS 'Associated Job Posting',
+    jp.Number,
+    DATEDIFF(day,ap.DateApplied,cp.QualifiedDate) AS 'Days from Application to Qualified'
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
 INNER JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
+LEFT JOIN JobPostings jp ON jp.Id = ap.JobPostingId
 INNER JOIN CandidateProfileInformations cp ON cp.Id = ap.CandidateId
 LEFT JOIN (     
     SELECT         
