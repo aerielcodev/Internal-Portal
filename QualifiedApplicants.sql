@@ -12,7 +12,7 @@ SELECT
     DATEDIFF(day,ap.DateApplied,cp.QualifiedDate) AS 'Days from Application to Qualified'
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
-INNER JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
+LEFT JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
 LEFT JOIN JobPostings jp ON jp.Id = ap.JobPostingId
 INNER JOIN CandidateProfileInformations cp ON cp.Id = ap.CandidateId
 LEFT JOIN (     
