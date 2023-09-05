@@ -36,7 +36,8 @@ SELECT DISTINCT
     jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
     j.RecruiterId AS placementSupervisorId,
     j.LastModified,
-    mb.lastModified AS 'Last Modified By'
+    mb.lastModified AS 'Last Modified By',
+    emp.eId AS teamMemberEmployeeId
 FROM JobOpeningNumbers jon
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
