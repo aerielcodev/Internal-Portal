@@ -1,4 +1,15 @@
 /*displays various applicant touchpoints*/
+WITH EarliestRecord AS (
+    SELECT
+        ApplicantJobPostingId,
+        MIN(Created) AS EarliestCreated,
+        ApplicationStageId
+    FROM
+        ApplicantJobPostingProgresses
+    GROUP BY
+        ApplicantJobPostingId,ApplicationStageId
+)
+
 SELECT
     a.Id AS ApplicantId,
     ap.Id AS ApplicantJobPostingsId,
@@ -17,7 +28,20 @@ LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
 LEFT JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
 LEFT JOIN JobPostings jp ON jp.Id = ap.JobPostingId
 LEFT JOIN CandidateProfileInformations cp ON cp.Id = ap.CandidateId
-LEFT JOIN ApplicantJobPostingProgresses ajp ON ajp.ApplicantJobPostingId = ap.Id
+/*LEFT JOIN ApplicantJobPostingProgresses ajp ON ajp.ApplicantJobPostingId = ap.Id*/
+LEFT JOIN (
+    SELECT
+     t.*
+FROM
+    ApplicantJobPostingProgresses t
+JOIN
+    EarliestRecord er
+ON
+    t.ApplicantJobPostingId = er.ApplicantJobPostingId
+    AND t.Created = er.EarliestCreated
+    AND t.Created >= er.EarliestCreated
+    AND t.Created <= DATEADD(HOUR, 24, er.EarliestCreated) 
+) ajp ON ajp.ApplicantJobPostingId = ap.Id 
 LEFT JOIN ApplicationStages ast ON ast.Id = ajp.ApplicationStageId
 /*LEFT JOIN (     
     SELECT         
