@@ -1,5 +1,6 @@
 SELECT DISTINCT
 pto.Id AS Id, 
+pto.EmployeeId,
 s.Name AS 'Status', 
 ud.Email AS Email, 
 ud.CodevId AS 'Employee Number', 
@@ -24,7 +25,6 @@ LEFT JOIN [dbo].[PtoStatuses] s ON s.Id = pto.StatusId
 LEFT JOIN [dbo].[LeaveTypes] lt ON lt.Id = pto.LeaveTypeId 
 INNER JOIN Employees e ON e.Id = pto.EmployeeId 
 INNER JOIN UserDetails ud ON ud.UserId = e.UserId 
-LEFT JOIN EmployeeHRReferences hr ON hr.Id = e.EmployeeHrReferenceId
 LEFT JOIN UserDetails app ON app.UserId = pto.ApprovalBy
 LEFT JOIN CustomerUserDetails cu ON cu.UserId = pto.ApprovalBy
 ORDER BY Id DESC

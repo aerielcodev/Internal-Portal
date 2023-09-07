@@ -8,21 +8,28 @@ SELECT DISTINCT
         WHEN jc.CandidateId IS NOT NULL THEN c.FirstName + ' ' + c.LastName
         ELSE e.FirstName + ' ' + e.LastName
     END AS Name,
-    js.Name AS 'Job Opening Endorsement Status',
+    CASE
+        WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not a Fit'
+        WHEN js.Id = 10 THEN 'JO Requested' 
+        WHEN js.Id = 6 THEN 'JO Extended' 
+        WHEN js.Id = 5 THEN 'JO Made' 
+        WHEN js.Id = 8 THEN 'JO Declined'
+        ELSE js.Name
+    END  AS 'Job Opening Endorsement Status',
     jc.Created AS Created,
     CASE
         WHEN jc.Recommendation = 1 THEN 'Endorse'
         WHEN jc.Recommendation = 2 THEN 'Do Not Endorse'
         WHEN jc.Recommendation = 3 THEN 'Not A Fit'
-    END AS Recommendation,    
-    naft.Name AS 'Not A Fit Category',
-    jc.Note,
+    END AS Recommendation,  
+    coalesce(jft.Name,naft.Name) AS 'Not A Fit Category',
+    coalesce(jf.Details,jc.Note) AS Note,
     eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
-    ir.name AS 'Interview Requested By',
+    coalesce(ir.name,CONCAT(ir2.FirstName,' ',ir2.LastName)) AS 'Interview Requested By',
     jc.CustomerNote AS 'Customer Visible Note',
     cxNote.name AS 'Customer Visible Note Added By',    
-    d.name AS 'Declined By',
+    COALESCE(d.name,CONCAT(d2.FirstName,' ',d2.LastName)) AS 'Declined By',
     IIF(jc.InterviewRequestedBy IS NOT NULL,'Y','N') AS 'Interview Requested',
     jc.InitialInterviewRequestDate,
     jc.JobOfferExtended,
@@ -32,7 +39,8 @@ SELECT DISTINCT
     jc.JobOpeningId AS JobOpeningId,
     jop.Id AS JobOpeningPositionId,
     jc.LastModified,
-    jc.InterviewRequestedBy
+    jc.InterviewRequestedBy,
+    d.Email AS declinerEmail
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -52,13 +60,16 @@ LEFT JOIN (
 LEFT JOIN JobOpeningEndorsementStatuses js ON js.Id = jc.JobOpeningEndorsementStatusId
 LEFT JOIN NotAFitCategoryTypes naft ON naft.Id = jc.NotAFitCategoryTypeId
 LEFT JOIN UserDetails eb ON eb.UserId = jc.CreatedBy /*user who endorsed the candidate*/ 
+LEFT JOIN JobOpeningRecommendationFeedbacks jf ON jf.Id = jc.JobOpeningRecommendationFeedbackId
+LEFT JOIN JobOpeningRecommendationFeedbackTypes jft ON jft.Id = jf.RecommendationFeedbackTypeId
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
-        FirstName + ' ' + LastName AS name
+        FirstName + ' ' + LastName AS name,
+        Email
     FROM CustomerUserDetails
-    WHERE Status = 1
     )  d ON d.UserId = jc.DeclinedBy
+LEFT JOIN UserDetails d2 ON d2.UserId = jc.DeclinedBy
 LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 LEFT JOIN (
     SELECT DISTINCT 
@@ -74,9 +85,9 @@ LEFT JOIN (
     FROM CustomerUserDetails
     WHERE Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
+LEFT JOIN UserDetails ir2 ON ir2.UserId = jc.InterviewRequestedBy
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 
- (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' ) 
+ (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' )
   AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
-
 

@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     j.Id AS Id,
     c.id AS CustomerId,
     jop.Id AS JobOpeningPositionId,
@@ -30,12 +30,16 @@ SELECT
         WHEN j.DifficultyId = 3 THEN 'Hard'
     END AS Difficulty,
     j.IsCustomerCreated AS IsCustomerCreated,
+    COALESCE(cb.createdBy,CONCAT(cbc.createdByCustomer,' (',c.CompanyName,')')) AS 'Created By',
     j.Created AS Created,
     j.CreatedBy AS CreatedByUserId,
     jop.VerifiedStatusChangeDate AS VerifiedStatusChangeDate,
-    j.RecruiterId AS placementSupervisorId
+    j.RecruiterId AS placementSupervisorId,
+    j.LastModified,
+    mb.lastModified AS 'Last Modified By',
+    emp.eId AS teamMemberEmployeeId
 FROM JobOpeningNumbers jon
-LEFT JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
+INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
 LEFT JOIN JobOpeningStatuses js ON js.Id = jop.JobOpeningStatusId
 LEFT JOIN JobPositions jp ON jp.Id = j.JobPositionId
@@ -51,7 +55,7 @@ INNER JOIN Offices ON Offices.Id = JobOpeningLocations.OfficeId
 GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
 LEFT JOIN Teams t ON t.Id = j.TeamId
-LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id
+LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.IsDeleted = 0
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
@@ -63,8 +67,24 @@ LEFT JOIN RateIncreases ri ON ri.EmployeeId = ce.EmployeeId AND ri.EffectiveDate
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') placementSup
+        UPPER(string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',')) placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
-WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' )/**281 is the dummy customer*/ 
+LEFT JOIN (
+    SELECT
+        UserId,
+        concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) lastModified
+    FROM  UserDetails
+) AS mb ON  mb.UserId = j.LastModifiedBy
+LEFT JOIN (
+    SELECT DISTINCT
+        UserId,
+        concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) createdBy
+    FROM  UserDetails
+) AS cb ON cb.UserId = j.CreatedBy
+LEFT JOIN (SELECT DISTINCT
+    UserId,
+    concat(FirstName ,' ' ,LastName) AS createdByCustomer
+FROM CustomerUserDetails) cbc ON cbc.UserId = j.CreatedBy
+WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
