@@ -6,7 +6,8 @@ SELECT DISTINCT
       c.CompanyName AS Customer,
       cr.Name AS 'Role Name',
       ud.[Status],
-      u.IsActive
+      u.IsActive,
+      IIF(cr.CustomerId IS NOT NULL,'Y','N') AS 'Custom Role'
   FROM CustomerUsers u
   INNER JOIN CustomerUserDetails ud ON u.CustomerUserDetailsId = ud.Id
   LEFT JOIN Customers c ON c.Id = u.CustomerId
