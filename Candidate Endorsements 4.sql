@@ -10,7 +10,8 @@ SELECT  DISTINCT
     COALESCE(cb.Name,CONCAT(cb2.FirstName,' ',cb2.LastName)) AS UpdatedBy,
     jop.Id AS JobOpeningPositionId,
     jc.JobOpeningId,
-    ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated) AS rn
+    ROW_NUMBER() OVER(PARTITION BY jcs.JobOpeningCandidateId ORDER BY jcs.DateStatusUpdated) AS rn,
+    cb.UserId AS customerUserId
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
