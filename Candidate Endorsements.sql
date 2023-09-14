@@ -41,7 +41,8 @@ SELECT DISTINCT
     jc.LastModified,
     jc.InterviewRequestedBy,
     d.Email AS declinerEmail,
-    d.UserId AS declinerUserId
+    d.UserId AS declinerUserId,
+    ir.UserId AS interviewRequestedUserId
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
