@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     ce.CustomerId,
     ce.DateStart AS 'Placement/Offboard',
     ce.id,
@@ -29,7 +29,7 @@ OUTER APPLY (
 LEFT JOIN RateIncreases ft ON ft.CustomerEmployeeId = ce.Id AND ft.ReasonId = 4
 WHERE c.Id != 1 AND ce.Id IS NOT NULL AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' ) AND c.Id != 281 AND ce.IsDeleted = 0
 UNION ALL
-SELECT
+SELECT DISTINCT
 ce.CustomerId,
     ce.DateEnd,
     ce.id,
