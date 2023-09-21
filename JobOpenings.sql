@@ -38,7 +38,8 @@ SELECT DISTINCT
     j.LastModified,
     mb.lastModified AS 'Last Modified By',
     emp.eId AS teamMemberEmployeeId,
-    ce.Id AS customerEmployeesId
+    ce.Id AS customerEmployeesId,
+    jop.HubSpotDealId
 FROM JobOpeningNumbers jon
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
