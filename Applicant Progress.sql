@@ -58,5 +58,5 @@ AND
         AND LOWER(a.LastName) NOT LIKE '%test%'
         AND LOWER(a.FirstName) NOT LIKE '%demo%'
         AND LOWER(a.LastName) NOT LIKE '%demo%'
-    ) 
+    )  AND ap.StatusId <> 3 /*StatusId = 3 are deleted profiles*/
 ORDER BY ajp.Created DESC
