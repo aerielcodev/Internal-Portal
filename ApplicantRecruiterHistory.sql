@@ -32,7 +32,7 @@ SELECT
     CONCAT(TRIM(a.FirstName),' ',TRIM(a.LastName)) AS Name,
     r.name AS Recruiter,
     cte.Created AS 'Start Date',
-    cte.endDate,
+    cte.endDate AS 'End Date',
     cb.name AS 'Created By'
 FROM cte
 JOIN Applicants a ON a.Id = cte.ApplicantId
