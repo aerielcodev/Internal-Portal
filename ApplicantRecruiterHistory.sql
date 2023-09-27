@@ -28,6 +28,7 @@ FROM ApplicantRecruiters) AS b ON b.ApplicantId = a.ApplicantId AND (a.rn + 1 = 
 SELECT
     cte.Id,
     cte.ApplicantId,
+    r.Id AS employeeId,
     CONCAT(TRIM(a.FirstName),' ',TRIM(a.LastName)) AS Name,
     r.name AS Recruiter,
     cte.Created AS 'Start Date',

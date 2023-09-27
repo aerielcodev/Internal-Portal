@@ -1,4 +1,5 @@
 SELECT 
+e.Id AS employeeId,
 CONCAT(trim(ud.FirstName),' ',trim(ud.LastName)) AS Name,
 ep.Name AS Position,
 p.Name AS Permission,
