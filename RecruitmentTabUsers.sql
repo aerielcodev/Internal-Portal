@@ -4,7 +4,7 @@ CONCAT(trim(ud.FirstName),' ',trim(ud.LastName)) AS Name,
 ep.Name AS Position,
 p.Name AS Permission,
 ce.DateStart,
-ce.DateEnd,
+COALESCE(ce.DateEnd,e.DeletedDate) AS DateEnd,
 ce.JobTitle,
 c.CompanyName
 FROM Employees e
