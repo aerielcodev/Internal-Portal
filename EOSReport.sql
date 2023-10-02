@@ -21,4 +21,5 @@ LEFT JOIN (SELECT es.EmployeeId,u.*
 FROM EmployeeSupervisors es 
 LEFT JOIN Employees e2 ON e2.id = es.SupervisorId 
 LEFT JOIN UserDetails u ON  e2.UserId = u.UserId) s ON s.EmployeeId = e.Id
+WHERE year(eosR.[Created]) >= 2023
 ORDER BY EOSDate DESC
