@@ -26,12 +26,21 @@ WITH cte AS (SELECT DISTINCT
     ) AS lastP ON lastP.CustomerId = cc.CustomerId
     WHERE cc.CustomerId != 281 /*281 is the dummy customer's id*/)
 SELECT
-    *,
+    cte.Id,
+    cte.CustomerId,
+    cte.EmployeeId,
+    cte.Name,
+    cte.DateStart,
+    cte.DateEndTest,
+    cte.Assignment,
     ROW_NUMBER() OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) ASC) AS 'Contact RowNum',
     CASE
         WHEN cte.DateEndTest IS NULL THEN NULL
-        WHEN DATEADD(day,1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC)) <> cte.DateStart THEN DATEADD(day,-1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC))
+        WHEN DATEADD(day,1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC)) <> cte.DateStart 
+            THEN DATEADD(day,-1,LAG(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC))
+        WHEN DATEADD(day,1,cte.DateEndTest) = LEAD(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC)
+            THEN cte.DateEndTest
     END
      AS DateEnd
 FROM cte
-WHERE cte.isInvalid = 'N'
+WHERE cte.isInvalid = 'N' 
