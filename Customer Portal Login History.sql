@@ -1,3 +1,4 @@
+/*lists all login history in the internal portal*/
 SELECT DISTINCT
       l.[Id],
       l.[UserId],
