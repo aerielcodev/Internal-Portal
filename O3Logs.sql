@@ -15,4 +15,4 @@ LEFT JOIN (SELECT emp.*,e.Id FROM Employees e INNER JOIN UserDetails emp ON emp.
 /*LEFT JOIN [dbo].[UserDetailsView] s ON f.CreatedBy = s.UserId */
 LEFT JOIN [dbo].[Employees] e ON f.EmployeeId = e.Id 
 LEFT JOIN [dbo].[UserDetails] e2 ON e.UserId = e2.UserId 
-WHERE f.FeedbackTypeId = 3 and f.Id = 6941
+WHERE f.FeedbackTypeId = 3 

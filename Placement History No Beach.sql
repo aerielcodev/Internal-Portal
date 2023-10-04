@@ -31,6 +31,8 @@ cte_result AS (
     CASE
         WHEN DateEndTest IS NULL THEN NULL
         WHEN DATEADD(day,1,LAG(DateStart) OVER(PARTITION BY CustomerId,CustomerCodevContactTypeId ORDER BY cast(DateStart AS Date) DESC)) <> DateStart THEN DATEADD(day,-1,LAG(DateStart) OVER(PARTITION BY CustomerId,CustomerCodevContactTypeId ORDER BY cast(DateStart AS Date) DESC))
+        WHEN DATEADD(day,1,DateEndTest) = LEAD(DateStart) OVER(PARTITION BY CustomerId,CustomerCodevContactTypeId ORDER BY cast(DateStart AS Date) DESC)
+            THEN DateEndTest
     END
      AS DateEnd
     FROM cte_custContacts
@@ -159,4 +161,4 @@ WHERE
     AND ce.IsDeleted = 0
     AND c.CompanyName NOT LIKE 'codev%'
     AND c.CompanyName NOT LIKE '%breakthrough%'
-    AND ce.Id IS NOT NULL
+    AND ce.Id IS NOT NULL 
