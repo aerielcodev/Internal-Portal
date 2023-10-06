@@ -1,3 +1,4 @@
+/*List all skills searched in the Customer Portal*/
 WITH SplitSkills AS (
   SELECT 
     Id,
