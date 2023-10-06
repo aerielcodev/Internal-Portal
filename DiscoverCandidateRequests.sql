@@ -7,13 +7,15 @@ SELECT
     CONCAT(TRIM(cpi.FirstName),' ',TRIM(cpi.LastName)) AS Candidate,
     dr.DateRequested,
     cx.customerUserName AS 'Requested By',
-    dr.Created
+    dr.Created,
+    ds.Name AS 'Discover Status'
     /*dr.CandidateTypeId,
     dr.CreatedBy,
     dr.LastModifiedBy,
     dr.LastModified,
     dr.StatusId*/
   FROM DiscoverCandidateRequests dr
+  LEFT JOIN DiscoverCandidateStatuses ds ON ds.Id = dr.StatusId
   LEFT JOIN (
     SELECT
         c.CompanyName,
