@@ -10,10 +10,8 @@ SELECT
       WHEN c.FirstName IS NULL THEN e.Name
       ELSE CONCAT(TRIM(c.FirstName),' ',TRIM(c.LastName))
     END AS Candidate,
-    da.DiscoverAuditActionTypeId,
-    dat.Name,
+    dat.Name AS Action,
     da.IsBench,
-    da.CreatedBy,
     da.Created,
     da.LastModifiedBy,
     da.LastModified
