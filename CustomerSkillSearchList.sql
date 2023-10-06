@@ -16,7 +16,7 @@ WITH SplitSkills AS (
 )
 SELECT 
     ss.Id, 
-    s.Name
+    s.Name AS Skill
 FROM SplitSkills ss
 JOIN Skills s ON s.Id = ss.skill
 
