@@ -21,7 +21,7 @@ SELECT
     FROM Employees emp
     JOIN UserDetails ud ON emp.UserId = ud.UserId
   ) e ON e.Id = df.EmployeeId
-LEFT JOIN (
+JOIN (
     SELECT
         cu.Id,
         CONCAT(TRIM(cud.FirstName),' ',TRIM(cud.LastName)) AS Name,
