@@ -60,7 +60,7 @@ SELECT DISTINCT
     fRate.NewRate AS 'First Rate',
     lRate.NewRate AS 'Latest Rate',
     o.Cat AS 'Offboarding Category',
-    o.subCat AS 'Offboarding SubCategory',
+    sub.subCat AS 'Offboarding SubCategory',
     r.secondarySubCat AS 'Offboarding Secondary SubCategory',
     eo.Note AS 'Offboarding Note',
     emp.Location AS 'Assigned Office',
@@ -104,7 +104,22 @@ LEFT JOIN (
     INNER JOIN Countries c ON c.Id = cp.CountryId
 ) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
 LEFT JOIN EmployeeOffboardings eo ON eo.CustomerEmployeeId = ce.Id
-LEFT JOIN ( /*grabs the category and subcategory */
+LEFT JOIN (/*grabs the subcategory*/
+    SELECT
+        o.Id,
+        STRING_AGG(r.subCat,' ; ') AS subCat
+    FROM EmployeeOffboardings o
+    INNER JOIN (
+        SELECT DISTINCT
+            s.EmployeeOffboardingId,
+            s3.Name AS subCat
+        FROM EmployeeOffboardingSecondarySubCategories s 
+        INNER JOIN OffboardingSecondarySubCategories s2 ON s2.Id = s.OffboardingSecondarySubCategoryId
+        INNER JOIN OffboardingSubCategories s3 ON s3.Id = s2.SubCategoryId
+    ) AS r ON r.EmployeeOffboardingId = o.Id
+    GROUP BY o.Id
+) AS sub ON sub.Id = eo.Id
+LEFT JOIN ( /*grabs the category and subcategory*/
     SELECT DISTINCT
         eossc.EmployeeOffboardingId,
         oc.Name AS Cat,
