@@ -1,5 +1,6 @@
 SELECT     
     cp.Id AS 'Id',   
+    ap.Id AS ApplicantJobPostingId,
     trim(REPLACE(cp.FirstName,char(9),'')) + ' ' + trim(cp.LastName) AS Name,     
     s.Name AS Status,     
 CASE         
