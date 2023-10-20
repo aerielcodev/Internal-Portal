@@ -14,6 +14,7 @@ SELECT DISTINCT
         WHEN js.Id = 6 THEN 'JO Extended' 
         WHEN js.Id = 5 THEN 'JO Made' 
         WHEN js.Id = 8 THEN 'JO Declined'
+        WHEN js.Id BETWEEN 1 AND 4 THEN IIF(COALESCE(cs.Name,cs2.Name) IS NOT NULL,'Not a Fit',js.Name)
         ELSE js.Name
     END  AS 'Job Opening Endorsement Status',
     jc.Created AS Created,
@@ -38,7 +39,10 @@ SELECT DISTINCT
     jc.PartTimeStartDate,
     jc.JobOpeningId AS JobOpeningId,
     jop.Id AS JobOpeningPositionId,
-    jc.LastModified,
+	CASE
+        WHEN js.Id BETWEEN 1 AND 4 THEN IIF(COALESCE(cs.Name,cs2.Name) IS NOT NULL,COALESCE(c.CandidateStatusChangeDate,e.CandidateStatusChangeDate),jc.LastModified)
+        ELSE jc.LastModified
+	END AS LastModified,
     jc.InterviewRequestedBy,
     d.Email AS declinerEmail,
     d.UserId AS declinerUserId,
@@ -54,7 +58,9 @@ LEFT JOIN (
     emp.FirstName,
     emp.LastName,
     emp.CodevId,
-    e.Id 
+    e.Id,
+	e.CandidateStatusId,
+	e.CandidateStatusChangeDate
     FROM Employees e 
     INNER JOIN UserDetails emp ON emp.UserId = e.UserId)
      e ON e.Id = jc.EmployeeId 
@@ -88,6 +94,8 @@ LEFT JOIN (
     WHERE Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
 LEFT JOIN UserDetails ir2 ON ir2.UserId = jc.InterviewRequestedBy
+LEFT JOIN CandidateStatuses cs ON cs.Id = c.CandidateStatusId AND cs.Id BETWEEN 4 AND 7
+LEFT JOIN CandidateStatuses cs2 ON cs2.Id = e.CandidateStatusId AND cs2.Id BETWEEN 4 AND 7
 /*remove any dummy candidate endorsements and any endorsements coming for codev/breakthrough*/
  WHERE j.CustomerId != 281 AND 
  (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' )
