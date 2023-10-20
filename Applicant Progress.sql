@@ -18,7 +18,7 @@ SELECT
     jp.Title AS 'Associated Job Posting',
     jp.Number,
     iif(cb.UserId IS NULL,a.CreatedBy,CONCAT(cb.FirstName,' ',cb.LastName)) AS CreatedBy,
-    cp.QualifiedDate,
+    qd.Created AS 'QualifiedDate',
     ast.Name AS 'Status',
     ap.DateApplied AS 'Date Applied',
     ajp.Created AS 'Status Updated On',
@@ -43,6 +43,20 @@ ON
     AND t.Created <= DATEADD(HOUR, 24, er.EarliestCreated) 
 ) ajp ON ajp.ApplicantJobPostingId = ap.Id 
 LEFT JOIN ApplicationStages ast ON ast.Id = ajp.ApplicationStageId
+LEFT JOIN ( /*grabs only their qualified status*/
+    SELECT
+     t.*
+FROM
+    ApplicantJobPostingProgresses t
+JOIN
+    EarliestRecord er
+ON
+    t.ApplicantJobPostingId = er.ApplicantJobPostingId
+    AND t.Created = er.EarliestCreated
+    AND t.Created >= er.EarliestCreated
+    AND t.Created <= DATEADD(HOUR, 24, er.EarliestCreated) 
+    AND t.ApplicationStageId = 4
+) qd ON qd.ApplicantJobPostingId = ap.Id 
 /*LEFT JOIN (     
     SELECT         
     Employees.Id AS eId,         
