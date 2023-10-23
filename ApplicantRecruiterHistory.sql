@@ -33,7 +33,8 @@ SELECT
     r.name AS Recruiter,
     cte.Created AS 'Start Date',
     cte.endDate AS 'End Date',
-    cb.name AS 'Created By'
+    cb.name AS 'Created By',
+    ROW_NUMBER() OVER(PARTITION BY cte.ApplicantId ORDER BY cte.Created) AS 'Row Number'
 FROM cte
 JOIN Applicants a ON a.Id = cte.ApplicantId
 LEFT JOIN (
