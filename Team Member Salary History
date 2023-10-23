@@ -1,5 +1,5 @@
 /*Grabs the salary history of Team Members regardless of the team member's profile.*/
-SELECT
+WITH cte AS (SELECT
     es.Id AS employeeSalaryHistoryId,
     ud.CodevId AS 'Employee Number',
     CONCAT(ud.FirstName,' ',ud.LastName) AS 'Team Member',
@@ -17,4 +17,19 @@ JOIN Employees e ON e.Id = es.EmployeeId
 JOIN UserDetails ud ON ud.userId = e.userId
 LEFT JOIN UserDetails cb ON cb.userId = es.CreatedBy
 LEFT JOIN UserDetails mb ON mb.userId = es.LastModifiedBy
-LEFT JOIN RateIncreaseReasons r ON r.Id = es.ReasonId
+LEFT JOIN RateIncreaseReasons r ON r.Id = es.ReasonId)
+
+SELECT
+    a.*,
+    DATEADD(DAY,-1,b.EffectiveDate) AS 'EndDate'
+FROM (
+    SELECT
+    *,
+    ROW_NUMBER() OVER(PARTITION BY "Employee Number" ORDER BY EffectiveDate) AS rn
+FROM cte) AS a
+LEFT JOIN (
+    SELECT
+    "Employee Number",
+    EffectiveDate,
+    ROW_NUMBER() OVER(PARTITION BY "Employee Number" ORDER BY EffectiveDate) AS rn
+FROM cte) AS b ON b."Employee Number" = a."Employee Number" AND (a.rn + 1 = b.rn)

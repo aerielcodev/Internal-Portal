@@ -22,7 +22,7 @@ SELECT DISTINCT
     jon.Number AS 'Job Opening Number',
     t.Name AS 'Team Name',
     ps.placementSup AS 'Placement Supervisor',
-    NULL AS Recruiter,  /*placeholder while waiting for Recruiter field*/
+    r.recruiter AS Recruiter,  /*placeholder while waiting for Recruiter field*/
     ofc.location AS 'Office Location',
     CASE
         WHEN j.DifficultyId = 1 THEN 'Easy'
@@ -72,7 +72,15 @@ LEFT JOIN (
         UPPER(string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',')) placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
-GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Recruiter assigned to the Job Opening*/
+GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Placement Supervisor assigned to the Job Opening*/
+LEFT JOIN (
+    SELECT
+        STRING_AGG(CONCAT(TRIM(ud.FirstName),' ',TRIM(ud.LastName)),', ') AS Recruiter,
+        jr.JobOpeningId
+    FROM JobOpeningRecruiters jr
+    JOIN Employees e ON e.Id = jr.RecruiterId
+    JOIN UserDetails ud ON ud.userId = e.userId
+    GROUP BY jr.JobOpeningId) AS r ON  r.JobOpeningId = j.Id/*Looks for the Recruiter assigned to the Job Opening*/
 LEFT JOIN (
     SELECT
         UserId,
