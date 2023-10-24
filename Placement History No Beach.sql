@@ -50,7 +50,7 @@ SELECT DISTINCT
     ce.JobTitle AS 'Job Title',
     c.CompanyName,
     csm.Name AS 'Customer Success Manager - Placement',
-    ae.Name AS 'Account Executive - Placement',
+    COALESCE(ae.Name,ae2.Name) AS 'Account Executive - Placement',
     ts.Name AS 'Talent Supervisor - Placement',
     ce.DateStart,
     ce.DateEnd,
@@ -155,6 +155,13 @@ LEFT JOIN (
 ) AS ae ON ae.CustomerId = c.Id  AND ae.CustomerCodevContactTypeId = 1
 AND (ae.DateStart <= cast(ce.DateStart AS date) 
 AND (ae.DateEnd >= cast(ce.DateStart AS date) OR ae.DateEnd IS NULL))
+LEFT JOIN (
+    SELECT
+        *
+    FROM cte_result
+) AS ae2 ON ae2.CustomerId = c.Id  AND ae2.CustomerCodevContactTypeId = 1
+AND (ae2.DateStart >= cast(ce.DateStart AS date) 
+AND (ae2.DateEnd <= cast(ce.DateStart AS date) OR ae2.DateEnd IS NULL))
 LEFT JOIN (
     SELECT
         *
