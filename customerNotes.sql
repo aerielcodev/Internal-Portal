@@ -1,10 +1,11 @@
 /*Notes saved in the customer's profile*/
 SELECT
     cn.Id,
-    cn.CustomerId,
-    c.CompanyName AS Customer,
+	cn.NoteTypeId,
     nt.Name AS 'Note Type',
     cn.Message,
+    cn.CustomerId,
+    c.CompanyName AS Customer,
     CONCAT(TRIM(cb.FirstName),' ',TRIM(cb.LastName)) AS 'Created By',
     cn.Created AS 'Created Date',
     CONCAT(TRIM(mb.FirstName),' ',TRIM(mb.LastName)) AS 'Last Modified By',
