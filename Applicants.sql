@@ -35,6 +35,8 @@ SELECT
         WHEN ap.StatusId = 3 THEN 'Deleted'
     END AS Class,
     r.recruiter AS 'Current Recruiter',
+    a.Email,
+    a.ContactNumber,
     IIF(ar.Id IS NULL,'N','Y') AS 'Has Recruiter'
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
