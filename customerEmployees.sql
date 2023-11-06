@@ -14,7 +14,7 @@ SELECT DISTINCT
     CONCAT(TRIM(mb.FirstName) ,' ' ,TRIM(mb.LastName)) AS 'Modified By',
     cs.Name AS 'Candidate Status',
 	ROW_NUMBER() OVER(PARTITION BY ce.EmployeeId ORDER BY ce.DateStart) AS 'Sequence Number',
-    (CASE WHEN LAG(ce.CustomerId) OVER (PARTITION BY ce.EmployeeId ORDER BY ce.DateStart) = 1 THEN 'Yes' ELSE 'No' END) AS 'placedFromBench' 
+    (CASE WHEN LAG(ce.CustomerId) OVER (PARTITION BY ce.EmployeeId ORDER BY ce.DateStart) = 1 THEN 'Yes' ELSE 'No' END) AS 'fromBench' 
 FROM Customers c 
 LEFT JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
 LEFT JOIN (SELECT emp.*,e.Id, e.CandidateStatusId FROM Employees e INNER JOIN UserDetails emp ON emp.UserId = e.UserId) emp ON emp.Id = ce.EmployeeId
