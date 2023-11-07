@@ -16,7 +16,7 @@ SELECT DISTINCT
     js.Name AS 'Job Opening Status',
     j.IdealStartDate AS 'Ideal Start Date',
     ce.DateStart,
-    ri.NewRate AS Rate,
+    fRate.NewRate AS Rate,
     emp.teamMember,
     j.Budget AS Budget,
     jon.Number AS 'Job Opening Number',
@@ -65,7 +65,9 @@ LEFT JOIN (
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS emp ON  emp.eId = ce.EmployeeId
-LEFT JOIN RateIncreases ri ON ri.EmployeeId = ce.EmployeeId AND ri.EffectiveDate = ce.DateStart
+OUTER APPLY (
+    SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate ASC
+    ) AS fRate
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
@@ -97,4 +99,7 @@ LEFT JOIN (SELECT DISTINCT
     UserId,
     concat(FirstName ,' ' ,LastName) AS createdByCustomer
 FROM CustomerUserDetails) cbc ON cbc.UserId = j.CreatedBy
-WHERE j.CustomerId != 281 AND (c.CompanyName NOT LIKE 'codev%' AND c.CompanyName NOT LIKE '%breakthrough%' AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
+WHERE j.CustomerId != 281 AND 
+(c.CompanyName NOT LIKE 'codev%' 
+AND c.CompanyName NOT LIKE '%breakthrough%' 
+AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
