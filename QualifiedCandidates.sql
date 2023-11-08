@@ -1,17 +1,45 @@
+WITH placedTeamMembers AS (
+    SELECT
+        e.CandidateProfileInformationId,
+        ud.CodevId,
+        jop.Id AS JobOpeningPositionId,
+        c.CompanyName,
+        jon.Number AS jobOpeningNumber,
+        ce.JobTitle,
+        CAST(ce.DateStart AS date) AS firstPlacementDate
+    FROM dbo.JobOpeningNumbers jon 
+    JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
+    JOIN JobOpenings j ON j.Id = jop.JobOpeningId
+    JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.isDeleted = 0
+    JOIN Employees e ON e.Id = ce.EmployeeId
+    JOIN UserDetails ud ON ud.UserId = e.UserId
+    JOIN Customers c ON c.Id = ce.CustomerId
+    LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
+    WHERE 
+        c.Id NOT IN (1, 281)
+    AND c.CompanyName NOT LIKE 'codev%'
+    AND c.CompanyName NOT LIKE '%breakthrough%'
+    AND ce.Id IS NOT NULL 
+)
+
 SELECT     
     cp.Id AS 'Id',   
     ap.Id AS ApplicantJobPostingId,
     trim(REPLACE(cp.FirstName,char(9),'')) + ' ' + trim(cp.LastName) AS Name,     
     s.Name AS Status,     
-CASE         
-    WHEN cp.GenderId  = 1 THEN 'Male'         
-    WHEN cp.GenderId = 2 THEN 'Female'         
-    ELSE 'Not Specified'     
-END AS Gender,     
-    isnull(cp.QualifiedDate,cp.Created) AS 'Qualified Date',   
-    cp.Email,  
-    cp.ContactNumber,
-    r.recruiter AS Recruiter,     
+    CASE         
+        WHEN cp.GenderId  = 1 THEN 'Male'         
+        WHEN cp.GenderId = 2 THEN 'Female'         
+        ELSE 'Not Specified'     
+    END AS Gender,     
+        isnull(cp.QualifiedDate,cp.Created) AS 'Qualified Date',   
+        cp.Email,  
+        cp.ContactNumber,
+        r.recruiter AS Recruiter,     
+    pt.firstPlacementDate AS 'First Placement',
+    pt.CompanyName AS Customer,
+    pt.jobOpeningNumber AS 'Job Opening Number',
+    pt.CodevId AS 'CoDev Id',
     CASE
         WHEN ap.SourceId = 1 THEN 'CoDev Career Site'
         WHEN ap.SourceId = 2 THEN 'Facebook'
@@ -73,5 +101,8 @@ LEFT JOIN (
 LEFT JOIN ApplicantJobPostings ap ON cp.Id = ap.CandidateId
 LEFT JOIN Countries c ON c.Id = cp.CountryId
 LEFT JOIN States st ON st.Id = cp.StateId
+OUTER APPLY (
+    SELECT TOP 1 *  FROM placedTeamMembers WHERE CandidateProfileInformationId = cp.Id ORDER BY firstPlacementDate ASC
+) AS pt
 WHERE (cp.FirstName NOT LIKE '%demo%' AND cp.FirstName NOT LIKE '%test%' AND cp.LastName NOT LIKE '%demo%')
 ORDER BY 'Qualified Date' DESC
