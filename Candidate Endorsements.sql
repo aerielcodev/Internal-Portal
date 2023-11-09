@@ -5,11 +5,11 @@ SELECT DISTINCT
     jc.CandidateId,
     e.CodevId,
     CASE
-        WHEN jc.CandidateId IS NOT NULL THEN c.FirstName + ' ' + c.LastName
-        ELSE e.FirstName + ' ' + e.LastName
+        WHEN jc.CandidateId IS NOT NULL THEN CONCAT(c.FirstName,' ',c.LastName) 
+        ELSE CONCAT(e.FirstName , ' ' , e.LastName)
     END AS Name,
     CASE
-        WHEN jft.Name IS NOT NULL OR naft.Name IS NOT NULL THEN 'Not a Fit'
+        WHEN (jft.Name IS NOT NULL OR naft.Name IS NOT NULL) AND js.Id <> 9 THEN 'Not a Fit'
         WHEN js.Id = 10 THEN 'JO Requested' 
         WHEN js.Id = 6 THEN 'JO Extended' 
         WHEN js.Id = 5 THEN 'JO Made' 
@@ -25,7 +25,7 @@ SELECT DISTINCT
     END AS Recommendation,  
     coalesce(jft.Name,naft.Name) AS 'Not A Fit Category',
     coalesce(jf.Details,jc.Note) AS Note,
-    eb.FirstName + ' ' + eb.LastName AS 'Endorsed By',
+    CONCAT(eb.FirstName , ' ' , eb.LastName) AS 'Endorsed By',
     jc.EndorsementStatusChangeDate AS 'Endorsement Status Change Date',
     coalesce(ir.name,CONCAT(ir2.FirstName,' ',ir2.LastName)) AS 'Interview Requested By',
     jc.CustomerNote AS 'Customer Visible Note',
@@ -100,4 +100,3 @@ LEFT JOIN CandidateStatuses cs2 ON cs2.Id = e.CandidateStatusId AND cs2.Id BETWE
  WHERE j.CustomerId != 281 AND 
  (cx.CompanyName NOT LIKE 'codev%' AND cx.CompanyName NOT LIKE '%breakthrough%' )
   AND jc.Created >= CONVERT(DATE,'2022-12-06') /*Dec. 6, 2022 is the official day that we started endorsing candidates to customers*/
-
