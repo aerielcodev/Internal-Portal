@@ -6,6 +6,7 @@ WITH cte AS (SELECT
     es.BasePay AS Base,
     es.Allowance,
     es.EffectiveDate,
+    e.DeletedDate,
     r.Name AS Reason,
     es.Note,
     CONCAT(cb.FirstName,' ',cb.LastName) AS 'Created By',
@@ -21,7 +22,7 @@ LEFT JOIN RateIncreaseReasons r ON r.Id = es.ReasonId)
 
 SELECT
     a.*,
-    DATEADD(DAY,-1,b.EffectiveDate) AS 'EndDate'
+    DATEADD(DAY,-1,COALESCE(b.EffectiveDate,b.DeletedDate)) AS 'EndDate'
 FROM (
     SELECT
     *,
@@ -31,5 +32,7 @@ LEFT JOIN (
     SELECT
     CodevId,
     EffectiveDate,
+    DeletedDate,
     ROW_NUMBER() OVER(PARTITION BY CodevId ORDER BY EffectiveDate) AS rn
 FROM cte) AS b ON b.CodevId = a.CodevId AND (a.rn + 1 = b.rn)
+WHERE a.CodevId = '2018-1144'
