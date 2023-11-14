@@ -22,7 +22,7 @@ SELECT DISTINCT
     jon.Number AS 'Job Opening Number',
     t.Name AS 'Team Name',
     ps.placementSup AS 'Placement Supervisor',
-    r.recruiter AS Recruiter,  /*placeholder while waiting for Recruiter field*/
+    r.recruiter AS Recruiter,
     ofc.location AS 'Office Location',
     CASE
         WHEN j.DifficultyId = 1 THEN 'Easy'
