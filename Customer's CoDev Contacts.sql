@@ -3,10 +3,11 @@ WITH cte AS (SELECT DISTINCT
         cc.CustomerId,
         emp.Id AS EmployeeId,
         concat(emp.FirstName,' ',emp.LastName) AS Name,
-        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) AS DateStart,
+        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cc.DateStart) AS DateStart,
         IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEndTest,
         ct.Name AS Assignment,
-        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid
+        iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid,
+        cc.IsActive
     FROM INTERNALSERVICEDB.dbo.CustomerCodevContacts cc
     LEFT JOIN Customers c ON c.Id = cc.CustomerId
     LEFT JOIN (
@@ -41,6 +42,10 @@ SELECT
         WHEN DATEADD(day,1,cte.DateEndTest) = LEAD(cte.DateStart) OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cast(cte.DateStart AS Date) DESC)
             THEN cte.DateEndTest
     END
-     AS DateEnd
+     AS DateEnd,
+    CASE
+        WHEN ROW_NUMBER() OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cte.DateStart DESC) = 1 THEN 'Y'
+        ELSE 'N'
+    END AS isCurrent
 FROM cte
-WHERE cte.isInvalid = 'N' 
+WHERE cte.isInvalid = 'N'
