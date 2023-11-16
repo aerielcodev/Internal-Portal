@@ -3,7 +3,8 @@ WITH cte AS (SELECT DISTINCT
         cc.CustomerId,
         emp.Id AS EmployeeId,
         concat(emp.FirstName,' ',emp.LastName) AS Name,
-        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cc.DateStart) AS DateStart,
+        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cast(cc.DateStart AS Date)) AS DateStart,
+        iif(cast(cc.DateStart AS Date) = '0001-01-01','1970-01-01',cc.DateStart ) AS DateStartTest,
         IIF(cc.DateEnd IS NULL AND c.Status = 2,CAST(lastP.endOfLastPlacement AS Date),DATEADD(day,-1,CAST(cc.DateEnd AS Date))) AS DateEndTest,
         ct.Name AS Assignment,
         iif(cast(cc.DateStart AS Date) = '0001-01-01' AND cc.DateEnd IS NULL AND cc.IsActive = 0,'Y','N') AS isInvalid,
@@ -44,7 +45,7 @@ SELECT
     END
      AS DateEnd,
     CASE
-        WHEN ROW_NUMBER() OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cte.DateStart DESC) = 1 THEN 'Y'
+        WHEN ROW_NUMBER() OVER(PARTITION BY cte.CustomerId,cte.Assignment ORDER BY cte.DateStartTest DESC) = 1 THEN 'Y'
         ELSE 'N'
     END AS isCurrent
 FROM cte
