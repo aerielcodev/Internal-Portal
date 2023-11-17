@@ -22,7 +22,7 @@ WITH placedTeamMembers AS (
     AND ce.Id IS NOT NULL 
 )
 
-SELECT     
+SELECT DISTINCT
     cp.Id AS 'Id',   
     ap.Id AS ApplicantJobPostingId,
     trim(REPLACE(cp.FirstName,char(9),'')) + ' ' + trim(cp.LastName) AS Name,     
@@ -59,6 +59,9 @@ SELECT
     END AS 'Source of Candidate',
     cp.Created,     
     o.offices AS 'Preferred Office',
+    ps.preferredShifts AS 'Shift Availability',
+    ao.Name AS Availability,
+    cp.AvailabilityCustomDate AS 'Availability Custom Date',
     qPosn.posn AS 'Qualified Positions',
     qPosn.types AS 'Qualified Types',
     qPosn.teams AS 'Qualified Teams',
@@ -98,6 +101,21 @@ LEFT JOIN (
   INNER JOIN JobTeams jteam ON jteam.Id = jt.JobTeamId
   GROUP BY CandidateProfileInformationId
 ) AS qPosn ON qPosn.CandidateProfileInformationId = cp.Id
+LEFT JOIN (
+    SELECT
+        STRING_AGG(
+            CASE
+                WHEN ShiftScheduleId = 1 THEN 'Morning'
+                WHEN ShiftScheduleId = 2 THEN 'Mid'
+                WHEN ShiftScheduleId = 3 THEN 'Night'
+            END,
+            ', '
+        ) AS preferredShifts,
+        CandidateProfileInformationId
+    FROM CandidatePreferredShifts
+    GROUP BY CandidateProfileInformationId
+) AS ps ON ps.CandidateProfileInformationId = cp.Id
+LEFT JOIN AvailabilityOptions ao ON ao.Id = cp.AvailabilityId
 LEFT JOIN ApplicantJobPostings ap ON cp.Id = ap.CandidateId
 LEFT JOIN Countries c ON c.Id = cp.CountryId
 LEFT JOIN States st ON st.Id = cp.StateId
