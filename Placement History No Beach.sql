@@ -103,7 +103,7 @@ LEFT JOIN (
     FROM CandidateProfileInformations cp 
     INNER JOIN Countries c ON c.Id = cp.CountryId
 ) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
-LEFT JOIN EmployeeOffboardings eo ON eo.CustomerEmployeeId = ce.Id
+LEFT JOIN EmployeeOffboardings eo ON eo.CustomerEmployeeId = ce.Id AND eo.IsCancelled = 0
 LEFT JOIN (/*grabs the subcategory*/
     SELECT
         o.Id,
@@ -176,8 +176,8 @@ LEFT JOIN (
 )  AS  csm ON csm.CustomerId = c.Id AND csm.CustomerCodevContactTypeId = 3
 AND (csm.DateStart <= cast(ce.DateStart AS date) 
 AND (csm.DateEnd  >= cast(ce.DateStart AS date) OR csm.DateEnd IS NULL))
-LEFT JOIN UserDetails ocb ON ocb.UserId = eo.CreatedBy
-LEFT JOIN UserDetails omb ON omb.UserId = eo.LastModifiedBy
+LEFT JOIN UserDetails ocb ON ocb.UserId = eo.CreatedBy AND eo.IsCancelled = 0
+LEFT JOIN UserDetails omb ON omb.UserId = eo.LastModifiedBy AND eo.IsCancelled = 0
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
