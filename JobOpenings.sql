@@ -103,3 +103,4 @@ WHERE j.CustomerId != 281 AND
 (c.CompanyName NOT LIKE 'codev%' 
 AND c.CompanyName NOT LIKE '%breakthrough%' 
 AND c.CompanyName NOT LIKE '%Test%')/**281 is the dummy customer*/ 
+AND j.isDeleted = 0
