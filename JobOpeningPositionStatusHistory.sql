@@ -1,8 +1,10 @@
+/*what's the latest date they entered each status*/
 SELECT
     JobOpeningPositionId,
     jobOpeningId,
     jobOpeningNumber,
     [Developing],
+    -- Looks for the latest date a user clicked on Verified. If there is no date, we use the VerifiedStatusChangeDate column
     coalesce([Verified],VerifiedStatusChangeDate) AS Verified,
     [Candidates Presented],
     [Interviewing],
