@@ -20,12 +20,41 @@ WITH placedTeamMembers AS (
     AND c.CompanyName NOT LIKE 'codev%'
     AND c.CompanyName NOT LIKE '%breakthrough%'
     AND ce.Id IS NOT NULL 
+), 
+recruitersWithPods AS (
+    SELECT
+    ce.id AS customerEmployeesId,
+    ce.EmployeeId,
+    emp.CoDevId,
+    emp.recruiter,
+    ce.JobTitle,
+    CASE /*Assign Alyssa and Julie to their respective pods*/
+        WHEN emp.CoDevId = '2019-1189' THEN 'CoDev Recruitment (Alyssa)' 
+        WHEN emp.CoDevId = '2020-1293' THEN 'CoDev Recruitment (Julie)'
+        ELSE c.CompanyName
+    END AS Pod,
+    CONVERT(date,ce.DateStart) AS Placement,
+    COALESCE(CONVERT(date,ce.DateEnd),CONVERT(date,emp.DeletedDate)) AS placementEnd
+FROM Customers c 
+JOIN CustomerEmployees ce ON ce.CustomerId = c.Id
+JOIN (
+    SELECT 
+    UPPER(CONCAT(TRIM(emp.FirstName),' ',TRIM(emp.LastName))) as recruiter,
+    e.Id, 
+    e.DeletedDate,
+    emp.CodevId 
+    FROM Employees e 
+    JOIN UserDetails emp ON emp.UserId = e.UserId
+    ) emp ON emp.Id = ce.EmployeeId
+WHERE ce.IsDeleted = 0 
+    AND LOWER(c.CompanyName) LIKE 'codev recruit%' 
+    AND LOWER(ce.JobTitle) LIKE 'recruit%'
 )
 
 SELECT DISTINCT
     cp.Id AS 'Id',   
     ap.Id AS ApplicantJobPostingId,
-    trim(REPLACE(cp.FirstName,char(9),'')) + ' ' + trim(cp.LastName) AS Name,     
+    CONCAT(trim(REPLACE(cp.FirstName,char(9),'')) , ' ' , trim(cp.LastName)) AS Name,     
     s.Name AS Status,     
     CASE         
         WHEN cp.GenderId  = 1 THEN 'Male'         
@@ -57,6 +86,7 @@ SELECT DISTINCT
         WHEN ap.SourceId = 14 THEN 'Word of Mouth'
         WHEN ap.SourceId = 15 THEN 'Other'
     END AS 'Source of Candidate',
+    rp.Pod,
     cp.Created,     
     o.offices AS 'Preferred Office',
     ps.preferredShifts AS 'Shift Availability',
@@ -79,7 +109,7 @@ LEFT JOIN CandidateStatuses s ON s.Id = cp.CandidateStatusId
 LEFT JOIN (     
     SELECT         
     Employees.Id AS eId,         
-    UserDetails.FirstName + ' ' + UserDetails.LastName AS recruiter     
+    UPPER(CONCAT(TRIM(UserDetails.FirstName) , ' ' , TRIM(UserDetails.LastName))) AS recruiter     
     FROM Employees     
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId) AS r ON r.eId = cp.RecruiterId
 LEFT JOIN (
@@ -119,6 +149,9 @@ LEFT JOIN AvailabilityOptions ao ON ao.Id = cp.AvailabilityId
 LEFT JOIN ApplicantJobPostings ap ON cp.Id = ap.CandidateId
 LEFT JOIN Countries c ON c.Id = cp.CountryId
 LEFT JOIN States st ON st.Id = cp.StateId
+LEFT JOIN recruitersWithPods rp ON rp.EmployeeId = cp.RecruiterId 
+AND (CONVERT(date,cp.Created) <= rp.Placement 
+ AND (CONVERT(date,cp.Created) >= rp.PlacementEnd OR rp.PlacementEnd IS NULL))
 OUTER APPLY (
     SELECT TOP 1 *  FROM placedTeamMembers WHERE CandidateProfileInformationId = cp.Id ORDER BY firstPlacementDate ASC
 ) AS pt
