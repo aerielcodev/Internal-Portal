@@ -39,7 +39,8 @@ SELECT
     ast.Name AS 'Status',
     ap.DateApplied AS 'Date Applied',
     ajp.Created AS 'Status Updated On',
-    IIF(ub.FirstName IS NULL,ajp.CreatedBy,CONCAT(ub.FirstName,' ',ub.LastName)) AS 'Status Updated By'
+    IIF(ub.FirstName IS NULL,ajp.CreatedBy,CONCAT(ub.FirstName,' ',ub.LastName)) AS 'Status Updated By',
+    a.HubSpotId
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
 LEFT JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
