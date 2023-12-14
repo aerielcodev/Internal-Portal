@@ -2,7 +2,7 @@ SELECT
     ce.EmployeeId,
     ce.id,
     emp.CoDevId,
-    upper(emp.FirstName + ' ' + emp.LastName) AS 'Team Member',
+    UPPER(CONCAT(TRIM(emp.FirstName) , ' ' , TRIM(emp.LastName))) AS 'Team Member',
     ce.jobTitle AS 'Job Title',
     c.CompanyName,
     ce.DateStart,
@@ -40,5 +40,6 @@ OUTER APPLY (
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId ORDER BY EffectiveDate DESC
     ) AS lRate2
 WHERE c.Id = 1 AND ce.IsDeleted = 0
-AND (emp.FirstName NOT LIKE '%demo%'  AND  emp.FirstName NOT LIKE '%demo%')
+AND (lower(emp.FirstName) NOT LIKE '%demo%'  AND  lower(emp.FirstName) NOT LIKE '%demo%'
+AND lower(emp.FirstName) NOT LIKE '%test%' AND lower(concat(emp.FirstName, ' ', emp.LastName)) NOT LIKE '%jared whaley%')
 ORDER BY ce.DateStart DESC
