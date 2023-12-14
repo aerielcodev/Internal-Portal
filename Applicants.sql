@@ -37,7 +37,8 @@ SELECT
     r.recruiter AS 'Current Recruiter',
     a.Email,
     a.ContactNumber,
-    IIF(ar.Id IS NULL,'N','Y') AS 'Has Recruiter'
+    IIF(ar.Id IS NULL,'N','Y') AS 'Has Recruiter',
+    a.HubSpotId
 FROM Applicants a
 LEFT JOIN UserDetails cb ON cb.UserId = a.CreatedBy
 LEFT JOIN ApplicantJobPostings ap ON ap.ApplicantId = a.Id
