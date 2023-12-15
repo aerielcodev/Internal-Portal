@@ -150,8 +150,8 @@ LEFT JOIN ApplicantJobPostings ap ON cp.Id = ap.CandidateId
 LEFT JOIN Countries c ON c.Id = cp.CountryId
 LEFT JOIN States st ON st.Id = cp.StateId
 LEFT JOIN recruitersWithPods rp ON rp.EmployeeId = cp.RecruiterId 
-AND (CONVERT(date,cp.Created) <= rp.Placement 
- AND (CONVERT(date,cp.Created) >= rp.PlacementEnd OR rp.PlacementEnd IS NULL))
+AND (CONVERT(date,cp.Created) >= rp.Placement 
+ AND (CONVERT(date,cp.Created) <= rp.PlacementEnd OR rp.PlacementEnd IS NULL))
 OUTER APPLY (
     SELECT TOP 1 *  FROM placedTeamMembers WHERE CandidateProfileInformationId = cp.Id ORDER BY firstPlacementDate ASC
 ) AS pt
