@@ -46,7 +46,9 @@ SELECT DISTINCT
     jc.InterviewRequestedBy,
     d.Email AS declinerEmail,
     d.UserId AS declinerUserId,
-    ir.UserId AS interviewRequestedUserId
+    ir.UserId AS interviewRequestedUserId,
+    jc.EndorsementRank,
+    jc.PreFilteredRank
 FROM JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -73,7 +75,7 @@ LEFT JOIN JobOpeningRecommendationFeedbackTypes jft ON jft.Id = jf.Recommendatio
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
-        FirstName + ' ' + LastName AS name,
+        CONCAT(FirstName , ' ' , LastName) AS name,
         Email
     FROM CustomerUserDetails
     )  d ON d.UserId = jc.DeclinedBy
@@ -82,14 +84,14 @@ LEFT JOIN Customers cx ON cx.Id = j.CustomerId
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
-        FirstName + ' ' + LastName AS name
+        CONCAT(FirstName , ' ' , LastName) AS name
     FROM CustomerUserDetails
     WHERE Status = 1
     )  cxNote ON cxNote.UserId = jc.CustomerNoteAddedBy
 LEFT JOIN (
     SELECT DISTINCT 
         UserId, 
-        FirstName + ' ' + LastName AS name
+        CONCAT(FirstName , ' ' , LastName) AS name
     FROM CustomerUserDetails
     WHERE Status = 1
     )  ir ON ir.UserId = jc.InterviewRequestedBy
