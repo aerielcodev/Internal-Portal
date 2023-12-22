@@ -6,6 +6,11 @@ SELECT DISTINCT
     jt.Name AS 'Job Type',
     j.JobTitle AS 'Job Title',
     c.CompanyName AS Customer,
+    CASE
+        WHEN j.WorkSetupId = 1 THEN 'Remote'
+        WHEN j.WorkSetupId = 2 THEN 'Hybrid'
+        WHEN j.WorkSetupId = 3 THEN 'Onsite'
+    END AS 'Work Setup',
     jp.Name AS 'Position',
     joType.Name AS 'Type',
     joTeam.Name AS 'Team',
@@ -29,6 +34,7 @@ SELECT DISTINCT
         WHEN j.DifficultyId = 2 THEN 'Medium'
         WHEN j.DifficultyId = 3 THEN 'Hard'
     END AS Difficulty,
+    j.JobDescription,
     j.IsCustomerCreated AS IsCustomerCreated,
     COALESCE(cb.createdBy,CONCAT(cbc.createdByCustomer,' (',c.CompanyName,')')) AS 'Created By',
     j.Created AS Created,
