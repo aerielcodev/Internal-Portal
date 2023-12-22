@@ -20,6 +20,7 @@ SELECT DISTINCT
     END AS 'Customer Type',
     js.Name AS 'Job Opening Status',
     j.IdealStartDate AS 'Ideal Start Date',
+    jos.shiftSchedule AS 'Shift Availability',
     ce.DateStart,
     fRate.NewRate AS Rate,
     emp.teamMember,
@@ -54,7 +55,7 @@ LEFT JOIN JobPositions jp ON jp.Id = j.JobPositionId
 LEFT JOIN JobTypes joType ON joType.Id = jp.JobTypeId
 LEFT JOIN JobTeams joTeam ON joTeam.Id = joType.JobTeamId
 LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
-LEFT JOIN (
+LEFT JOIN (/*Retrieves office locations*/
     SELECT
     JobOpeningLocations.JobOpeningId AS JobOpeningId,
     string_agg(Offices.Location,',') AS location
@@ -64,44 +65,51 @@ GROUP BY JobOpeningLocations.JobOpeningId) AS ofc ON ofc.JobOpeningId = j.Id
 LEFT JOIN Customers c ON c.Id = j.CustomerId
 LEFT JOIN Teams t ON t.Id = j.TeamId
 LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.IsDeleted = 0
-LEFT JOIN (
+LEFT JOIN (/*Retrieves hired team member*/
     SELECT
         Employees.Id AS eId,
         string_agg(CONCAT(UserDetails.FirstName , ' ' , UserDetails.LastName),',') teamMember
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS emp ON  emp.eId = ce.EmployeeId
-OUTER APPLY (
+OUTER APPLY (/*Looks for the first rate added*/
     SELECT TOP 1 * FROM RateIncreases WHERE EmployeeId = ce.EmployeeId AND customerid = ce.customerid ORDER BY EffectiveDate ASC
     ) AS fRate
-LEFT JOIN (
+LEFT JOIN (/*Looks for the Placement Supervisor assigned to the Job Opening*/
     SELECT
         Employees.Id AS eId,
         UPPER(string_agg(CONCAT(UserDetails.FirstName , ' ' , UserDetails.LastName),',')) placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
-GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Placement Supervisor assigned to the Job Opening*/
-LEFT JOIN (
+GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId 
+LEFT JOIN (/*Looks for the Recruiter assigned to the Job Opening*/
     SELECT
         STRING_AGG(CONCAT(TRIM(ud.FirstName),' ',TRIM(ud.LastName)),', ') AS Recruiter,
         jr.JobOpeningId
     FROM JobOpeningRecruiters jr
     JOIN Employees e ON e.Id = jr.RecruiterId
     JOIN UserDetails ud ON ud.userId = e.userId
-    GROUP BY jr.JobOpeningId) AS r ON  r.JobOpeningId = j.Id/*Looks for the Recruiter assigned to the Job Opening*/
-LEFT JOIN (
+    GROUP BY jr.JobOpeningId) AS r ON  r.JobOpeningId = j.Id
+LEFT JOIN (/*Retrieve selected shift schedules*/
+    SELECT
+        js.JobOpeningId,
+        string_agg(CONCAT(jss.Name, ' ' , jss.Name),',') shiftSchedule
+    FROM JobOpeningShifts js
+    JOIN JobOpeningShiftSchedules jss ON jss.Id = js.ShiftScheduleId
+GROUP BY js.JobOpeningId) AS jos ON  jos.JobOpeningId = j.Id
+LEFT JOIN (/*Retrieve name of last modified user*/
     SELECT
         UserId,
         concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) lastModified
     FROM  UserDetails
 ) AS mb ON  mb.UserId = j.LastModifiedBy
-LEFT JOIN (
+LEFT JOIN (/*Retrieve name of job opening creator*/
     SELECT DISTINCT
         UserId,
         concat(UserDetails.FirstName ,' ' ,UserDetails.LastName) createdBy
     FROM  UserDetails
 ) AS cb ON cb.UserId = j.CreatedBy
-LEFT JOIN (SELECT DISTINCT
+LEFT JOIN (SELECT DISTINCT /*Retrieves customer name if created by customer*/
     UserId,
     concat(FirstName ,' ' ,LastName) AS createdByCustomer
 FROM CustomerUserDetails) cbc ON cbc.UserId = j.CreatedBy
