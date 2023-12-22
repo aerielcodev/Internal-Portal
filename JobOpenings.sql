@@ -42,7 +42,7 @@ SELECT DISTINCT
     jop.HubSpotDealId
 FROM JobOpeningNumbers jon
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
-LEFT JOIN JobOpenings j ON j.Id = jop.JobOpeningId
+INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
 LEFT JOIN JobOpeningStatuses js ON js.Id = jop.JobOpeningStatusId
 LEFT JOIN JobPositions jp ON jp.Id = j.JobPositionId
 LEFT JOIN JobTypes joType ON joType.Id = jp.JobTypeId
@@ -61,7 +61,7 @@ LEFT JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.IsDele
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',') teamMember
+        string_agg(CONCAT(UserDetails.FirstName , ' ' , UserDetails.LastName),',') teamMember
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS emp ON  emp.eId = ce.EmployeeId
@@ -71,7 +71,7 @@ OUTER APPLY (
 LEFT JOIN (
     SELECT
         Employees.Id AS eId,
-        UPPER(string_agg(UserDetails.FirstName + ' ' + UserDetails.LastName,',')) placementSup
+        UPPER(string_agg(CONCAT(UserDetails.FirstName , ' ' , UserDetails.LastName),',')) placementSup
     FROM Employees
     INNER JOIN UserDetails ON UserDetails.UserId = Employees.UserId
 GROUP BY Employees.Id) AS ps ON  ps.eId = j.RecruiterId /*Looks for the Placement Supervisor assigned to the Job Opening*/
