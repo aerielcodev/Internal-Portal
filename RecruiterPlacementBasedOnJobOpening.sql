@@ -56,12 +56,11 @@ LEFT JOIN (
     JOIN recruitersWithPods rp ON rp.EmployeeId = jr.RecruiterId
     WHERE CONVERT(date,jr.Created) >= rp.Placement 
         AND (CONVERT(date,jr.Created) <= rp.placementEnd OR rp.placementEnd IS NULL)
-    GROUP BY jr.JobOpeningId) AS r ON  r.JobOpeningId = j.Id/*Looks for the Recruiter assigned to the Job Opening*/
+    GROUP BY jr.JobOpeningId) AS r ON  r.JobOpeningId = j.Id /*Looks for the Recruiter assigned to the Job Opening*/
 INNER JOIN CustomerEmployees ce ON ce.JobOpeningPositionId = jop.Id AND ce.IsDeleted = 0
 INNER JOIN Employees e ON e.Id = ce.EmployeeId AND e.CandidateProfileInformationId IS NOT NULL
-/*e.CandidateProfileInformationId = cpi.Id
-INNER JOIN JobOpeningCandidates jc ON jc.JobOpeningId  = j.Id AND jc.CandidateId IS NOT NULL
-INNER JOIN CandidateProfileInformations cpi ON cpi.Id = jc.CandidateId */
+INNER JOIN CandidateProfileInformations cpi ON e.CandidateProfileInformationId = cpi.Id
+INNER JOIN JobOpeningCandidates jc ON (jc.CandidateId = cpi.Id AND jc.JobOpeningId  = j.Id) AND jc.CandidateId IS NOT NULL
 INNER JOIN UserDetails ud ON ud.UserId = e.UserId
 WHERE j.CustomerId != 281 AND 
 (c.CompanyName NOT LIKE 'codev%' 
