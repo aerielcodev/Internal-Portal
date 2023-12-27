@@ -93,7 +93,7 @@ LEFT JOIN (/*Looks for the Recruiter assigned to the Job Opening*/
 LEFT JOIN (/*Retrieve selected shift schedules*/
     SELECT
         js.JobOpeningId,
-        string_agg(CONCAT(jss.Name, ' ' , jss.Name),',') shiftSchedule
+        string_agg(jss.Name,',') shiftSchedule
     FROM JobOpeningShifts js
     JOIN JobOpeningShiftSchedules jss ON jss.Id = js.ShiftScheduleId
 GROUP BY js.JobOpeningId) AS jos ON  jos.JobOpeningId = j.Id
