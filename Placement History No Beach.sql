@@ -66,13 +66,13 @@ SELECT DISTINCT
     emp.Location AS 'Assigned Office',
     coalesce(candidateLoc.country,emp.Name) AS Country,
     lRate.Id AS lRateId,
-    cb.FirstName + ' ' + cb.LastName AS CreatedBy,
-    mb.FirstName + ' ' + mb.LastName AS ModifiedBy,
+    CONCAT(cb.FirstName , ' ' , cb.LastName) AS CreatedBy,
+    CONCAT(mb.FirstName , ' ' , mb.LastName) AS ModifiedBy,
     ce.Created,
     ce.LastModified,
 eo.Created AS 'Offboarding Log Date',
-ocb.FirstName + ' ' + ocb.LastName AS 'Offboarding Log Created By',
-omb.FirstName + ' ' + omb.LastName AS 'Offboarding Log Last Modified By'
+CONCAT(ocb.FirstName , ' ' , ocb.LastName) AS 'Offboarding Log Created By',
+CONCAT(omb.FirstName , ' ' , omb.LastName) AS 'Offboarding Log Last Modified By'
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -82,7 +82,7 @@ LEFT JOIN JobOpeningTypes jt ON jt.Id = j.JobOpeningTypeId
 LEFT JOIN (
     SELECT 
         emp.CodevId,
-        upper(trim(emp.FirstName) + ' ' + trim(emp.LastName)) AS teamMember,
+        upper(CONCAT(trim(emp.FirstName) ,' ' , trim(emp.LastName))) AS teamMember,
         e.Id,
         e.CandidateProfileInformationId, 
         ofc.Location,
