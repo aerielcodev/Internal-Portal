@@ -122,14 +122,13 @@ LEFT JOIN (/*grabs the subcategory*/
 LEFT JOIN ( /*grabs the category and subcategory*/
     SELECT DISTINCT
         eossc.EmployeeOffboardingId,
-        oc.Name AS Cat,
+        STRING_AGG(oc.Name,' ; ') AS Cat,
         STRING_AGG(osc.Name,' ; ') AS subCat
     FROM EmployeeOffboardingSecondarySubCategories eossc 
     INNER JOIN OffboardingSecondarySubCategories ossc ON ossc.Id = eossc.OffboardingSecondarySubCategoryId
     INNER JOIN OffboardingSubCategories osc ON osc.Id = ossc.SubCategoryId
     INNER JOIN OffboardingCategories oc ON oc.Id = osc.OffboardingCategoryId
-    GROUP BY eossc.EmployeeOffboardingId,
-        oc.Name
+    GROUP BY eossc.EmployeeOffboardingId
     ) AS o ON o.EmployeeOffboardingId = eo.Id
 LEFT JOIN (/*concatenates the offboarding's secondary subcategory*/
     SELECT 
