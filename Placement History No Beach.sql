@@ -72,7 +72,16 @@ SELECT DISTINCT
     ce.LastModified,
 eo.Created AS 'Offboarding Log Date',
 CONCAT(ocb.FirstName , ' ' , ocb.LastName) AS 'Offboarding Log Created By',
-CONCAT(omb.FirstName , ' ' , omb.LastName) AS 'Offboarding Log Last Modified By'
+CONCAT(omb.FirstName , ' ' , omb.LastName) AS 'Offboarding Log Last Modified By',
+LAG(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) AS 'Previous CustomerEmployeeId',
+LEAD(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) AS 'Next CustomerEmployeeId',
+CASE
+    WHEN ce.DateEnd IS NOT NULL THEN
+        CASE
+            WHEN LEAD(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) IS NOT NULL THEN 'Yes'
+            ELSE 'No'
+        END
+END AS 'Replaced'
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
