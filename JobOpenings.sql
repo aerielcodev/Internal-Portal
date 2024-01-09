@@ -46,7 +46,9 @@ SELECT DISTINCT
     mb.lastModified AS 'Last Modified By',
     emp.eId AS teamMemberEmployeeId,
     ce.Id AS customerEmployeesId,
-    jop.HubSpotDealId
+    jop.HubSpotDealId,
+    IIF(j.DiscoverCandidateRequestId IS NOT NULL,'Yes','No') AS 'Created from Discover Tab'
+
 FROM JobOpeningNumbers jon
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
