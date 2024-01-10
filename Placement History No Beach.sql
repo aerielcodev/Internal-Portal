@@ -70,18 +70,9 @@ SELECT DISTINCT
     CONCAT(mb.FirstName , ' ' , mb.LastName) AS ModifiedBy,
     ce.Created,
     ce.LastModified,
-eo.Created AS 'Offboarding Log Date',
-CONCAT(ocb.FirstName , ' ' , ocb.LastName) AS 'Offboarding Log Created By',
-CONCAT(omb.FirstName , ' ' , omb.LastName) AS 'Offboarding Log Last Modified By',
-LAG(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) AS 'Previous CustomerEmployeeId',
-LEAD(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) AS 'Next CustomerEmployeeId',
-CASE
-    WHEN ce.DateEnd IS NOT NULL THEN
-        CASE
-            WHEN LEAD(ce.id) OVER (PARTITION BY jon.Number ORDER BY ce.DateStart) IS NOT NULL THEN 'Yes'
-            ELSE 'No'
-        END
-END AS 'Replaced'
+    eo.Created AS 'Offboarding Log Date',
+    CONCAT(ocb.FirstName , ' ' , ocb.LastName) AS 'Offboarding Log Created By',
+    CONCAT(omb.FirstName , ' ' , omb.LastName) AS 'Offboarding Log Last Modified By'
 FROM dbo.JobOpeningNumbers jon 
 INNER JOIN JobOpeningPositions jop ON jop.JobOpeningNumberId = jon.Id
 INNER JOIN JobOpenings j ON j.Id = jop.JobOpeningId
@@ -112,7 +103,20 @@ LEFT JOIN (
     FROM CandidateProfileInformations cp 
     INNER JOIN Countries c ON c.Id = cp.CountryId
 ) AS candidateLoc ON candidateLoc.Id = emp.CandidateProfileInformationId
-LEFT JOIN EmployeeOffboardings eo ON eo.CustomerEmployeeId = ce.Id AND eo.IsCancelled = 0
+LEFT JOIN (
+    SELECT
+        Id,
+        CustomerEmployeeId,
+        Note,
+        CreatedBy,
+        Created,
+        LastModifiedBy,
+        LastModified,
+        OffboardToBench,
+        ROW_NUMBER() OVER(PARTITION BY CustomerEmployeeId ORDER BY LastModified DESC) AS rn
+    FROM EmployeeOffboardings
+    WHERE IsCancelled = 0
+) AS eo ON eo.CustomerEmployeeId = ce.Id AND eo.rn = 1
 LEFT JOIN (/*grabs the subcategory*/
     SELECT
         o.Id,
@@ -128,16 +132,19 @@ LEFT JOIN (/*grabs the subcategory*/
     ) AS r ON r.EmployeeOffboardingId = o.Id
     GROUP BY o.Id
 ) AS sub ON sub.Id = eo.Id
-LEFT JOIN ( /*grabs the category and subcategory*/
-    SELECT DISTINCT
+LEFT JOIN ( /*grabs the category*/
+    SELECT
+    ct.EmployeeOffboardingId,
+    STRING_AGG(ct.preCat, ' ; ') AS cat
+FROM (SELECT DISTINCT
         eossc.EmployeeOffboardingId,
-        STRING_AGG(oc.Name,' ; ') AS Cat,
-        STRING_AGG(osc.Name,' ; ') AS subCat
-    FROM EmployeeOffboardingSecondarySubCategories eossc 
-    INNER JOIN OffboardingSecondarySubCategories ossc ON ossc.Id = eossc.OffboardingSecondarySubCategoryId
-    INNER JOIN OffboardingSubCategories osc ON osc.Id = ossc.SubCategoryId
-    INNER JOIN OffboardingCategories oc ON oc.Id = osc.OffboardingCategoryId
-    GROUP BY eossc.EmployeeOffboardingId
+        oc.Name AS preCat
+FROM EmployeeOffboardingSecondarySubCategories eossc 
+INNER JOIN OffboardingSecondarySubCategories ossc ON ossc.Id = eossc.OffboardingSecondarySubCategoryId
+INNER JOIN OffboardingSubCategories osc ON osc.Id = ossc.SubCategoryId
+INNER JOIN OffboardingCategories oc ON oc.Id = osc.OffboardingCategoryId
+) AS ct
+GROUP BY ct.EmployeeOffboardingId
     ) AS o ON o.EmployeeOffboardingId = eo.Id
 LEFT JOIN (/*concatenates the offboarding's secondary subcategory*/
     SELECT 
@@ -184,8 +191,8 @@ LEFT JOIN (
 )  AS  csm ON csm.CustomerId = c.Id AND csm.CustomerCodevContactTypeId = 3
 AND (csm.DateStart <= cast(ce.DateStart AS date) 
 AND (csm.DateEnd  >= cast(ce.DateStart AS date) OR csm.DateEnd IS NULL))
-LEFT JOIN UserDetails ocb ON ocb.UserId = eo.CreatedBy AND eo.IsCancelled = 0
-LEFT JOIN UserDetails omb ON omb.UserId = eo.LastModifiedBy AND eo.IsCancelled = 0
+LEFT JOIN UserDetails ocb ON ocb.UserId = eo.CreatedBy AND eo.rn = 1
+LEFT JOIN UserDetails omb ON omb.UserId = eo.LastModifiedBy  AND eo.rn = 1
 WHERE
     c.Id NOT IN (1, 281)
     AND ce.IsDeleted = 0
