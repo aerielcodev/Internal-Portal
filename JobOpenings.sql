@@ -91,9 +91,10 @@ LEFT JOIN (/*Looks for the Recruiter assigned to the Job Opening*/
     FROM JobOpeningRecruiters jr
     JOIN Employees e ON e.Id = jr.RecruiterId
     JOIN UserDetails ud ON ud.userId = e.userId
-    WHERE jr.TypeId = 1
+    WHERE (jr.TypeId = 1 OR jr.TypeId IS NULL)
     GROUP BY jr.JobOpeningId
     ) AS r ON  r.JobOpeningId = j.Id
+
 LEFT JOIN (/*Retrieve selected shift schedules*/
     SELECT
         js.JobOpeningId,
